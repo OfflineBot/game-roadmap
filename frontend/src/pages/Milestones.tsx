@@ -181,11 +181,8 @@ export function Milestones() {
 
             </div>
 
-            {data && milestones.length === 0 ? (
-                <div className="empty">No milestones yet. Press n to add the first one.</div>
-            ) : (
-                <div className="page-actions">{addButton}</div>
-            )}
+            {data && milestones.length === 0 && <div className="empty">No milestones yet.</div>}
+            <div className="page-actions">{addButton}</div>
 
             {editing && (
                 <EntryDialog
