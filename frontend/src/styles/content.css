@@ -28,6 +28,8 @@
 }
 
 .badge {
+    flex: none;
+    white-space: nowrap;
     padding: 2px 7px;
     border-radius: 5px;
     background: var(--surface0);
@@ -48,6 +50,7 @@
 }
 
 .title {
+    min-width: 0;
     font-size: 15px;
     font-weight: 600;
     text-align: left;

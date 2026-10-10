@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import * as api from '../api'
 import { EntryDialog, type Entry } from '../components/EntryDialog'
 import { Icon } from '../components/Icon'
+import { InlineAdd } from '../components/InlineAdd'
 import { Page } from '../components/Page'
 import { ProgressBar } from '../components/ProgressBar'
 import { RichTextView } from '../components/RichTextView'
@@ -15,7 +16,6 @@ import type { Milestone, Task } from '../types'
 type Editing =
     | { kind: 'new-milestone' }
     | { kind: 'milestone'; milestone: Milestone }
-    | { kind: 'new-task'; milestone: Milestone }
     | { kind: 'task'; task: Task }
 
 function dialogTitle(editing: Editing): string {
@@ -24,8 +24,6 @@ function dialogTitle(editing: Editing): string {
             return 'New milestone'
         case 'milestone':
             return `Edit Milestone ${editing.milestone.number}`
-        case 'new-task':
-            return `New task in Milestone ${editing.milestone.number}`
         case 'task':
             return `Edit task ${editing.task.number}`
     }
@@ -34,7 +32,6 @@ function dialogTitle(editing: Editing): string {
 function dialogValue(editing: Editing): Entry {
     switch (editing.kind) {
         case 'new-milestone':
-        case 'new-task':
             return { name: '', text: '' }
         case 'milestone':
             return { name: editing.milestone.title, text: editing.milestone.description }
@@ -61,8 +58,6 @@ export function Milestones() {
                 return run(() => api.milestones.create(input))
             case 'milestone':
                 return run(() => api.milestones.update(editing.milestone.id, input))
-            case 'new-task':
-                return run(() => api.milestones.createTask(editing.milestone.id, input))
             case 'task':
                 return run(() => api.tasks.update(editing.task.id, input))
         }
@@ -166,13 +161,14 @@ export function Milestones() {
                                             </div>
                                         </div>
                                     ))}
-                                    <button
-                                        type="button"
-                                        className="add-link"
-                                        onClick={() => setEditing({ kind: 'new-task', milestone })}
-                                    >
-                                        <Icon name="plus" size={14} /> task
-                                    </button>
+                                    <InlineAdd
+                                        label="task"
+                                        onAdd={(title) =>
+                                            run(() =>
+                                                api.milestones.createTask(milestone.id, { title, description: '' }),
+                                            )
+                                        }
+                                    />
                                 </div>
                             )}
                         </section>
