@@ -1,0 +1,441 @@
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card {
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    border-radius: var(--radius);
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+}
+
+.card-body {
+    padding: 0 12px 12px 12px;
+}
+
+.badge {
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--surface0);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--subtext0);
+}
+
+.badge.accent {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--accent);
+}
+
+.badge.done {
+    background: color-mix(in srgb, var(--green) 20%, transparent);
+    color: var(--green);
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    border-radius: 4px;
+}
+
+button.title:hover {
+    color: var(--accent);
+}
+
+.title.done {
+    color: var(--overlay0);
+    text-decoration: line-through;
+}
+
+.muted {
+    color: var(--subtext0);
+}
+
+.dim {
+    color: var(--overlay0);
+}
+
+.progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progress-track {
+    flex: 1;
+    min-width: 54px;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: var(--surface0);
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 5px;
+    background: var(--accent);
+    transition: width 0.18s ease;
+}
+
+.progress-fill.complete {
+    background: var(--green);
+}
+
+.progress-label {
+    min-width: 42px;
+    font-size: 13px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--subtext0);
+    white-space: nowrap;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 6px 9px 8px;
+    border-radius: 6px;
+}
+
+.task:hover {
+    background: var(--base);
+}
+
+.task-number {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--overlay0);
+    min-width: 30px;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table th {
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--overlay0);
+    text-align: left;
+    border-bottom: 1px solid var(--surface0);
+}
+
+.items-table th.check-col,
+.items-table td.check-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.items-table th.check-col {
+    text-align: center;
+}
+
+.items-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--surface0) 55%, transparent);
+}
+
+.items-table tr:last-child td {
+    border-bottom: none;
+}
+
+.items-table tr:hover td {
+    background: var(--base);
+}
+
+.items-table .progress-col {
+    width: 190px;
+}
+
+.items-table .actions-col {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 4px 3px 9px;
+    border-radius: 999px;
+    background: var(--surface0);
+    font-size: 12px;
+}
+
+.chip-name:hover {
+    color: var(--accent);
+}
+
+.chip-x {
+    display: inline-flex;
+    width: 17px;
+    height: 17px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--overlay0);
+}
+
+.chip-x:hover {
+    background: var(--surface1);
+    color: var(--red);
+}
+
+.subcategory {
+    border: 1px solid var(--surface0);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--base);
+    padding: 8px 12px 10px;
+}
+
+.subcategory-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tag {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--surface0);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--overlay0);
+}
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: var(--gap);
+    align-items: start;
+}
+
+.dash-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--page, var(--accent));
+}
+
+.dash-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.dash-row .name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.docs-layout {
+    display: flex;
+    gap: var(--gap);
+    align-items: flex-start;
+}
+
+.docs-list {
+    width: 260px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+}
+
+.docs-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 9px;
+    border-radius: 6px;
+    color: var(--subtext0);
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+}
+
+.docs-item:hover {
+    background: var(--surface0);
+    color: var(--text);
+}
+
+.docs-item.active {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.docs-item .name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.docs-editor {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 16px;
+}
+
+.doc-title {
+    width: 100%;
+    padding: 2px 0;
+    margin-bottom: 4px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.doc-title:focus {
+    outline: none;
+    border-bottom-color: var(--surface1);
+}
+
+.hint {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--overlay0);
+}
+
+.spacer {
+    flex: 1;
+}
+
+.task {
+    align-items: flex-start;
+}
+
+.task .check {
+    margin-top: 3px;
+}
+
+.task-number {
+    padding-top: 2px;
+}
+
+.task-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.task .title {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.task-main .prose {
+    margin-top: 1px;
+}
+
+.items-table .title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.subcategory .title {
+    font-size: 14px;
+}
+
+.docs-editor .editor {
+    border: none;
+    background: none;
+}
+
+.docs-editor .editor-bar {
+    padding: 0 0 6px;
+    background: none;
+}
+
+.docs-editor .ProseMirror {
+    /* A readable line length, however wide the window is. */
+    max-width: 100ch;
+    min-height: 60vh;
+    padding: 10px 0;
+}
+
+.dash-card {
+    padding: 14px;
+}
+
+.dash-card-title {
+    text-decoration: none;
+}
+
+.dash-card-title:hover {
+    text-decoration: underline;
+}
+
+.card-grid {
+    display: grid;
+    gap: var(--gap);
+    align-items: start;
+}
+
+.card-grid.wide {
+    grid-template-columns: repeat(auto-fill, minmax(780px, 1fr));
+}
+
+.card-grid.narrow {
+    grid-template-columns: repeat(auto-fill, minmax(620px, 1fr));
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+.unsaved-dot {
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--yellow);
+}

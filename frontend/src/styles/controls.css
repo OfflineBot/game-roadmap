@@ -1,0 +1,212 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    background: var(--surface0);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: var(--surface1);
+}
+
+.btn.accent {
+    background: var(--accent);
+    color: var(--crust);
+}
+
+.btn.accent:hover {
+    filter: brightness(1.12);
+}
+
+.btn.danger {
+    background: var(--red);
+    color: var(--crust);
+}
+
+.btn.danger:hover {
+    filter: brightness(1.12);
+}
+
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    flex: none;
+    border-radius: 6px;
+    color: var(--overlay0);
+}
+
+.icon-btn:hover {
+    background: var(--surface0);
+    color: var(--text);
+}
+
+.icon-btn:disabled {
+    opacity: 0.25;
+    cursor: default;
+    background: none;
+}
+
+.icon-btn.danger:hover {
+    background: color-mix(in srgb, var(--red) 20%, transparent);
+    color: var(--red);
+}
+
+/* Row actions stay out of the way until the row is touched. */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    opacity: 0;
+}
+
+.hoverable:hover .actions,
+.actions:focus-within {
+    opacity: 1;
+}
+
+.field {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--crust);
+    border: 1px solid var(--surface0);
+    border-radius: 6px;
+}
+
+.field:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.field::placeholder {
+    color: var(--overlay0);
+}
+
+.label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--overlay0);
+}
+
+input[type="checkbox"].check {
+    appearance: none;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border: 1.5px solid var(--surface1);
+    border-radius: 5px;
+    background: var(--crust);
+    cursor: pointer;
+}
+
+input[type="checkbox"].check:hover {
+    border-color: var(--accent);
+}
+
+input[type="checkbox"].check:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+input[type="checkbox"].check:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--crust);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 8vh 24px 24px;
+    background: rgba(17, 17, 27, 0.72);
+}
+
+.dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 80vh;
+    overflow: auto;
+    padding: 18px;
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    border-radius: 12px;
+}
+
+.dialog h2 {
+    font-size: 16px;
+    color: var(--accent);
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.inline-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inline-add .field {
+    max-width: 320px;
+}
+
+.add-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--overlay0);
+}
+
+.add-link:hover {
+    background: var(--surface0);
+    color: var(--accent);
+}
+
+.key-hint {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(17, 17, 27, 0.22);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+    background: var(--surface0);
+}
+
+.btn:disabled .key-hint {
+    background: rgba(17, 17, 27, 0.18);
+}

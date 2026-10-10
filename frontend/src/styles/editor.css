@@ -1,0 +1,178 @@
+.editor {
+    overflow: hidden;
+    background: var(--crust);
+    border: 1px solid var(--surface0);
+    border-radius: var(--radius);
+}
+
+.editor:focus-within {
+    border-color: var(--accent);
+}
+
+.editor-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 5px;
+    background: var(--mantle);
+    border-bottom: 1px solid var(--surface0);
+}
+
+.editor-bar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 7px;
+    border-radius: 5px;
+    color: var(--subtext0);
+    font-size: 13px;
+}
+
+.editor-bar button:hover {
+    background: var(--surface0);
+    color: var(--text);
+}
+
+.editor-bar button.on {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--accent);
+}
+
+.editor-sep {
+    width: 1px;
+    height: 18px;
+    margin: 0 4px;
+    background: var(--surface0);
+}
+
+.swatch {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 5px;
+}
+
+.swatch span {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--swatch);
+}
+
+.prose,
+.editor .ProseMirror {
+    font-size: 14px;
+    color: var(--text);
+    word-break: break-word;
+}
+
+.editor .ProseMirror {
+    min-height: 120px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.prose.compact {
+    color: var(--subtext0);
+}
+
+.prose > :first-child,
+.ProseMirror > :first-child {
+    margin-top: 0;
+}
+
+.prose > :last-child,
+.ProseMirror > :last-child {
+    margin-bottom: 0;
+}
+
+.prose h1,
+.ProseMirror h1 {
+    margin: 0.8em 0 0.3em;
+    font-size: 20px;
+}
+
+.prose h2,
+.ProseMirror h2 {
+    margin: 0.8em 0 0.3em;
+    font-size: 17px;
+}
+
+.prose h3,
+.ProseMirror h3 {
+    margin: 0.8em 0 0.3em;
+    font-size: 15px;
+}
+
+.prose p,
+.ProseMirror p {
+    margin: 0.45em 0;
+}
+
+.prose ul,
+.prose ol,
+.ProseMirror ul,
+.ProseMirror ol {
+    margin: 0.45em 0;
+    padding-left: 1.35em;
+}
+
+.prose li,
+.ProseMirror li {
+    margin: 0.15em 0;
+}
+
+.prose li p,
+.ProseMirror li p {
+    margin: 0;
+}
+
+.prose code,
+.ProseMirror code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--crust);
+    color: var(--peach);
+    font-size: 13px;
+}
+
+.prose pre,
+.ProseMirror pre {
+    margin: 0.6em 0;
+    padding: 10px 12px;
+    overflow: auto;
+    border-radius: 6px;
+    background: var(--crust);
+    border: 1px solid var(--surface0);
+}
+
+.prose pre code,
+.ProseMirror pre code {
+    padding: 0;
+    background: none;
+    color: var(--text);
+}
+
+.prose blockquote,
+.ProseMirror blockquote {
+    margin: 0.6em 0;
+    padding-left: 12px;
+    border-left: 3px solid var(--surface1);
+    color: var(--subtext0);
+}
+
+.prose hr,
+.ProseMirror hr {
+    margin: 1em 0;
+    border: none;
+    border-top: 1px solid var(--surface0);
+}
+
+.prose a,
+.ProseMirror a {
+    color: var(--blue);
+}

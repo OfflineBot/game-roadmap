@@ -1,0 +1,85 @@
+/* Catppuccin Mocha */
+:root {
+    --crust: #11111b;
+    --mantle: #181825;
+    --base: #1e1e2e;
+    --surface0: #313244;
+    --surface1: #45475a;
+    --overlay0: #6c7086;
+    --subtext0: #a6adc8;
+    --text: #cdd6f4;
+
+    --mauve: #cba6f7;
+    --blue: #89b4fa;
+    --green: #a6e3a1;
+    --peach: #fab387;
+    --yellow: #f9e2af;
+    --red: #f38ba8;
+
+    /* Set per page by the layout. */
+    --accent: var(--mauve);
+
+    --radius: 8px;
+    --gap: 12px;
+    --sidebar: 210px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    background: var(--base);
+    color: var(--text);
+    font: 15px/1.5 "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: 0;
+    line-height: 1.25;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+input,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: var(--accent);
+}
+
+::selection {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--surface0);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--surface1);
+}

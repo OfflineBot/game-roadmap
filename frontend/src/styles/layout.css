@@ -1,0 +1,109 @@
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    width: var(--sidebar);
+    height: 100vh;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 18px 10px;
+    background: var(--mantle);
+    border-right: 1px solid var(--surface0);
+}
+
+.sidebar-title {
+    padding: 0 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--overlay0);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius);
+    color: var(--subtext0);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: var(--surface0);
+    color: var(--text);
+}
+
+.nav-item.active {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    color: var(--accent);
+}
+
+.nav-dot {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.nav-key {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--overlay0);
+}
+
+.sidebar-foot {
+    margin-top: auto;
+    padding: 0 10px;
+    font-size: 11px;
+    color: var(--overlay0);
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    max-width: 2000px;
+    padding: 20px 26px 80px;
+}
+
+.page-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.page-head h1 {
+    font-size: 21px;
+    color: var(--accent);
+}
+
+.page-error {
+    margin-bottom: 14px;
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--red) 18%, transparent);
+    color: var(--red);
+    font-size: 14px;
+}
+
+.empty {
+    padding: 26px;
+    border: 1px dashed var(--surface0);
+    border-radius: var(--radius);
+    color: var(--overlay0);
+    text-align: center;
+}
+
+.page-actions {
+    margin-top: var(--gap);
+}
