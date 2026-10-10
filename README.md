@@ -13,6 +13,21 @@ The site is on http://localhost:8080. Set `WEB_PORT` to use another port.
 Only the web container publishes a port; the API is reachable through it and
 not from the outside.
 
+### Surviving a reboot
+
+Both containers run with `restart: always`, so Docker starts them again after a
+reboot, a crash or a daemon restart. That only works if the Docker service
+itself starts with the system:
+
+```sh
+sudo systemctl enable --now docker
+systemctl is-enabled docker    # must print "enabled"
+```
+
+A reboot cannot damage the database either: sqlite runs in WAL mode with
+`synchronous=FULL`, so every committed change is on disk before the API
+answers, and an interrupted run is recovered on the next start.
+
 ### No login
 
 The app has no authentication, because it is built for a single person. On a
