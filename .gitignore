@@ -1,0 +1,7 @@
+# The local database - never committed, never overwritten by a pull.
+/data/*
+!/data/.gitkeep
+
+node_modules/
+frontend/dist/
+.env
