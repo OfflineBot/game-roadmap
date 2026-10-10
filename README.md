@@ -8,7 +8,7 @@ Personal tracker for a game project: milestones, asset checklists and notes.
 docker compose up -d --build
 ```
 
-The site is on http://localhost:8080. Set `WEB_PORT` to use another port.
+The site is on http://localhost:8420. Set `WEB_PORT` to use another port.
 
 Only the web container publishes a port; the API is reachable through it and
 not from the outside.
