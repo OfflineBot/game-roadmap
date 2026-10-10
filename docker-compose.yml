@@ -2,11 +2,12 @@ services:
   backend:
     build: ./backend
     restart: always
-    # Override APP_UID/APP_GID when the user owning ./data is not uid 1000.
-    user: "${APP_UID:-1000}:${APP_GID:-1000}"
     environment:
       DB_PATH: /data/roadmap.db
       PORT: "8080"
+      # The uid the server runs as; it takes ownership of ./data on start.
+      APP_UID: "${APP_UID:-1000}"
+      APP_GID: "${APP_GID:-1000}"
     volumes:
       - ./data:/data
 

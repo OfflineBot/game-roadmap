@@ -7,11 +7,14 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -o /out/roadmap .
 
+
 FROM alpine:3.22
 
+RUN apk add --no-cache su-exec
+
 COPY --from=build /out/roadmap /usr/local/bin/roadmap
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Runs as 1000 so the sqlite file on the host stays owned by the user.
-USER 1000:1000
-
-CMD ["roadmap"]
+# Starts as root only to fix ownership of the data directory, then runs the
+# server as APP_UID (1000 by default). See entrypoint.sh.
+ENTRYPOINT ["entrypoint.sh"]

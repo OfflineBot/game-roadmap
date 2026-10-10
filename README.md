@@ -34,16 +34,21 @@ The app has no authentication, because it is built for a single person. On a
 machine that is reachable from the internet, put it behind something that
 restricts access - a reverse proxy with basic auth, a VPN, or a firewall rule.
 
-### If the server user is not uid 1000
+### File ownership
 
-The backend runs as uid 1000 so the database file stays owned by a normal user.
-When the account that owns `data/` has a different id:
+The backend container starts as root only to take ownership of `data/`, then
+runs the server as uid 1000. That works no matter who created the directory, so
+a deployment as root (Coolify, a plain server) needs no extra setup. Set
+`APP_UID` and `APP_GID` to run as a different user.
 
-```sh
-APP_UID=$(id -u) APP_GID=$(id -g) docker compose up -d --build
-```
+### Coolify
 
-Without it the backend stops on start and says which directory it cannot write.
+Deploy the repository with the Docker Compose build pack; nothing else is
+needed. Coolify resolves the relative `./data` mount inside the resource
+directory and keeps it across deployments, so updates do not touch the
+database. If the site should be reachable through Coolify's proxy, give the
+`frontend` service a domain; the published `WEB_PORT` is only needed for
+direct access.
 
 ## Deploying an update
 
