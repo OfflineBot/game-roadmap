@@ -71,7 +71,9 @@
 .main {
     flex: 1;
     min-width: 0;
-    max-width: 2000px;
+    /* Centred instead of stretched, so rows stay readable on a wide screen. */
+    max-width: 1500px;
+    margin: 0 auto;
     padding: 20px 26px 80px;
 }
 

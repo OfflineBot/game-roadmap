@@ -4,6 +4,7 @@ import { EntryDialog, type Entry } from '../components/EntryDialog'
 import { Icon } from '../components/Icon'
 import { InlineAdd } from '../components/InlineAdd'
 import { Page } from '../components/Page'
+import { PageRail } from '../components/PageRail'
 import { ProgressBar } from '../components/ProgressBar'
 import { RichTextView } from '../components/RichTextView'
 import { RowActions } from '../components/RowActions'
@@ -74,14 +75,25 @@ export function Milestones() {
             title="Milestones"
             error={error}
             head={<ProgressBar value={milestonesProgress(milestones)} width={240} />}
+            rail={
+                <PageRail
+                    title="Roadmap"
+                    entries={milestones.map((milestone) => ({
+                        id: `milestone-${milestone.id}`,
+                        note: String(milestone.number),
+                        label: milestone.title,
+                        progress: milestoneProgress(milestone),
+                    }))}
+                />
+            }
         >
-            <div className="card-grid narrow">
+            <div className="stack">
                 {milestones.map((milestone, index) => {
                     const progress = milestoneProgress(milestone)
                     const open = expanded[milestone.id] ?? !progress.complete
 
                     return (
-                        <section className="card" key={milestone.id}>
+                        <section className="card" key={milestone.id} id={`milestone-${milestone.id}`}>
                             <div className="card-head hoverable">
                                 <button
                                     type="button"

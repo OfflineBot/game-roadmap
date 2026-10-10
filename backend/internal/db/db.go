@@ -3,8 +3,10 @@
 package db
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"log"
@@ -47,6 +49,10 @@ func Open(path string) (*sql.DB, error) {
 		conn.Close()
 		return nil, err
 	}
+	if err := report(conn, path); err != nil {
+		conn.Close()
+		return nil, err
+	}
 	return conn, nil
 }
 
@@ -63,57 +69,150 @@ func writable(dir string) error {
 	return os.Remove(probe)
 }
 
-// migrate applies every migration file beyond the version stored in the
-// database. The version is the number of files applied so far.
+// migrate applies every migration file the database has not seen yet. Applied
+// files are recorded with a checksum, so changing one after the fact is caught
+// instead of silently leaving the schema behind.
 func migrate(conn *sql.DB, path string, existing bool) error {
 	files, err := fs.ReadDir(migrations, "migrations")
 	if err != nil {
 		return err
 	}
 
-	var version int
-	if err := conn.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
-		return fmt.Errorf("read schema version: %w", err)
+	if _, err := conn.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (
+        name       TEXT PRIMARY KEY,
+        checksum   TEXT NOT NULL,
+        applied_at TEXT NOT NULL
+    )`); err != nil {
+		return fmt.Errorf("create migration table: %w", err)
 	}
-	if version > len(files) {
-		return fmt.Errorf("database is at schema version %d, this build only knows %d", version, len(files))
+
+	applied, err := appliedMigrations(conn)
+	if err != nil {
+		return err
 	}
-	if version == len(files) {
+	if len(applied) == 0 {
+		if applied, err = adoptVersionCounter(conn, files); err != nil {
+			return err
+		}
+	}
+
+	known := map[string]bool{}
+	var pending []fs.DirEntry
+	for _, file := range files {
+		known[file.Name()] = true
+
+		statements, err := migrations.ReadFile("migrations/" + file.Name())
+		if err != nil {
+			return err
+		}
+		sum := checksum(statements)
+
+		recorded, ok := applied[file.Name()]
+		if !ok {
+			pending = append(pending, file)
+			continue
+		}
+		if recorded != sum {
+			return fmt.Errorf("migration %s was changed after it had been applied - "+
+				"restore the file and add a new migration instead", file.Name())
+		}
+	}
+	for name := range applied {
+		if !known[name] {
+			return fmt.Errorf("the database has migration %s applied, which this build does not contain - "+
+				"deploy a newer build", name)
+		}
+	}
+	if len(pending) == 0 {
 		return nil
 	}
 
 	if existing {
-		if err := backup(conn, path, version); err != nil {
+		if err := backup(conn, path, len(applied)); err != nil {
 			return err
 		}
 	}
 
-	for i := version; i < len(files); i++ {
-		name := files[i].Name()
-		statements, err := migrations.ReadFile("migrations/" + name)
+	for _, file := range pending {
+		statements, err := migrations.ReadFile("migrations/" + file.Name())
 		if err != nil {
 			return err
 		}
-		if err := apply(conn, string(statements), i+1); err != nil {
-			return fmt.Errorf("migration %s: %w", name, err)
+		if err := apply(conn, file.Name(), statements, len(applied)+1); err != nil {
+			return fmt.Errorf("migration %s: %w", file.Name(), err)
 		}
-		log.Printf("applied migration %s", name)
+		applied[file.Name()] = checksum(statements)
+		log.Printf("applied migration %s", file.Name())
 	}
 	return nil
 }
 
-func apply(conn *sql.DB, statements string, version int) error {
+func appliedMigrations(conn *sql.DB) (map[string]string, error) {
+	rows, err := conn.Query(`SELECT name, checksum FROM schema_migrations`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	applied := map[string]string{}
+	for rows.Next() {
+		var name, sum string
+		if err := rows.Scan(&name, &sum); err != nil {
+			return nil, err
+		}
+		applied[name] = sum
+	}
+	return applied, rows.Err()
+}
+
+// adoptVersionCounter takes over databases from before schema_migrations
+// existed, which counted their progress in PRAGMA user_version.
+func adoptVersionCounter(conn *sql.DB, files []fs.DirEntry) (map[string]string, error) {
+	var version int
+	if err := conn.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
+		return nil, err
+	}
+	applied := map[string]string{}
+	if version == 0 {
+		return applied, nil
+	}
+	if version > len(files) {
+		return nil, fmt.Errorf("the database is at schema version %d, this build only knows %d - "+
+			"deploy a newer build", version, len(files))
+	}
+
+	for _, file := range files[:version] {
+		statements, err := migrations.ReadFile("migrations/" + file.Name())
+		if err != nil {
+			return nil, err
+		}
+		sum := checksum(statements)
+		if _, err := conn.Exec(`INSERT INTO schema_migrations (name, checksum, applied_at) VALUES (?, ?, ?)`,
+			file.Name(), sum, nowUTC()); err != nil {
+			return nil, err
+		}
+		applied[file.Name()] = sum
+	}
+	log.Printf("recorded %d migration(s) that this database already had", version)
+	return applied, nil
+}
+
+func apply(conn *sql.DB, name string, statements []byte, version int) error {
 	tx, err := conn.Begin()
 	if err != nil {
 		return err
 	}
-	if _, err := tx.Exec(statements); err != nil {
-		tx.Rollback()
+	defer tx.Rollback()
+
+	if _, err := tx.Exec(string(statements)); err != nil {
 		return err
 	}
-	// PRAGMA does not take bound parameters, the value is our own counter.
+	if _, err := tx.Exec(`INSERT INTO schema_migrations (name, checksum, applied_at) VALUES (?, ?, ?)`,
+		name, checksum(statements), nowUTC()); err != nil {
+		return err
+	}
+	// Kept in sync so an older build still recognises a newer database.
 	if _, err := tx.Exec(fmt.Sprintf("PRAGMA user_version = %d", version)); err != nil {
-		tx.Rollback()
 		return err
 	}
 	return tx.Commit()
@@ -138,4 +237,29 @@ func backup(conn *sql.DB, path string, version int) error {
 	}
 	log.Printf("backed up the database to %s before migrating", target)
 	return nil
+}
+
+// report makes it visible in the deployment log that the content is still there.
+func report(conn *sql.DB, path string) error {
+	var milestones, tasks, assets, documents int
+	err := conn.QueryRow(`SELECT
+        (SELECT COUNT(*) FROM milestones),
+        (SELECT COUNT(*) FROM tasks),
+        (SELECT COUNT(*) FROM assets),
+        (SELECT COUNT(*) FROM documents)`).Scan(&milestones, &tasks, &assets, &documents)
+	if err != nil {
+		return err
+	}
+	log.Printf("%s ready: %d milestones, %d tasks, %d assets, %d pages",
+		path, milestones, tasks, assets, documents)
+	return nil
+}
+
+func checksum(statements []byte) string {
+	sum := sha256.Sum256(statements)
+	return hex.EncodeToString(sum[:])
+}
+
+func nowUTC() string {
+	return time.Now().UTC().Format("2006-01-02 15:04:05")
 }

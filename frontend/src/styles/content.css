@@ -172,8 +172,15 @@ button.title:hover {
     width: 190px;
 }
 
+/* The name column keeps a sane width and the last column swallows the rest,
+   so a checkbox stays near the asset it belongs to on a wide screen. */
+.items-table th:first-child,
+.items-table td:first-child {
+    width: 36%;
+}
+
 .items-table .actions-col {
-    width: 1%;
+    width: auto;
     white-space: nowrap;
 }
 
@@ -417,18 +424,81 @@ button.title:hover {
     text-decoration: underline;
 }
 
-.card-grid {
-    display: grid;
-    gap: var(--gap);
-    align-items: start;
+.page-body {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
 }
 
-.card-grid.wide {
-    grid-template-columns: repeat(auto-fill, minmax(780px, 1fr));
+.page-main {
+    flex: 1;
+    min-width: 0;
 }
 
-.card-grid.narrow {
-    grid-template-columns: repeat(auto-fill, minmax(620px, 1fr));
+.rail {
+    position: sticky;
+    top: 20px;
+    width: 290px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    border-radius: var(--radius);
+}
+
+.rail-title {
+    padding: 4px 9px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--overlay0);
+}
+
+.rail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    padding: 7px 9px;
+    border-radius: 6px;
+    text-align: left;
+}
+
+.rail-item:hover {
+    background: var(--surface0);
+}
+
+.rail-head {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+}
+
+.rail-note {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--overlay0);
+}
+
+.rail-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+@media (max-width: 1250px) {
+    .rail {
+        display: none;
+    }
 }
 
 .table-scroll {

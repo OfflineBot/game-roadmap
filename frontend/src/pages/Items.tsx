@@ -4,6 +4,7 @@ import { EntryDialog, type Entry } from '../components/EntryDialog'
 import { Icon } from '../components/Icon'
 import { InlineAdd } from '../components/InlineAdd'
 import { Page } from '../components/Page'
+import { PageRail } from '../components/PageRail'
 import { ProgressBar } from '../components/ProgressBar'
 import { RichTextView } from '../components/RichTextView'
 import { RowActions } from '../components/RowActions'
@@ -158,13 +159,23 @@ export function Items() {
                     />
                 </>
             }
+            rail={
+                <PageRail
+                    title="Categories"
+                    entries={categories.map((category) => ({
+                        id: `category-${category.id}`,
+                        label: category.name,
+                        progress: categoryProgress(category),
+                    }))}
+                />
+            }
         >
-            <div className="card-grid wide">
+            <div className="stack">
                 {categories.map((category, index) => {
                     const open = !collapsed[category.id]
 
                     return (
-                    <section className="card" key={category.id}>
+                    <section className="card" key={category.id} id={`category-${category.id}`}>
                         <div className="card-head hoverable">
                             <button
                                 type="button"

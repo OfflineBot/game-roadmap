@@ -85,14 +85,20 @@ first start. Everything that could overwrite it is ruled out:
 | Restarting the app | the schema is applied through migrations that only ever add |
 | A future schema change | migrations run once, in a transaction, after a backup is written |
 | An older build on a newer database | the backend refuses to start instead of touching it |
+| Editing a migration that already ran | the checksum no longer matches and the backend refuses to start |
 | Copying the file while it runs | the server closes the database on SIGTERM, which folds the write-ahead log back into the single file |
 
 ### Migrations
 
 `backend/internal/db/migrations/` holds numbered `.sql` files. On start the
-backend compares their count with `PRAGMA user_version` and applies only what is
-missing, each one in a transaction. Before the first of them runs, a complete
-copy of the existing database is written to `data/backups/`.
+backend applies the ones the database has not seen, each in a transaction, and
+records every applied file with a checksum in `schema_migrations`. Before the
+first of them runs, a complete copy of the existing database is written to
+`data/backups/`.
+
+Because of the checksum, changing a file that was already applied is refused
+with an error instead of silently leaving the schema behind. The same goes for
+a build that is older than the database.
 
 To change the schema, add a new file - never edit an applied one:
 

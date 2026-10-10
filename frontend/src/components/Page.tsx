@@ -4,10 +4,11 @@ interface Props {
     title: string
     error: string | null
     head?: ReactNode
+    rail?: ReactNode
     children: ReactNode
 }
 
-export function Page({ title, error, head, children }: Props) {
+export function Page({ title, error, head, rail, children }: Props) {
     return (
         <>
             <header className="page-head">
@@ -15,7 +16,10 @@ export function Page({ title, error, head, children }: Props) {
                 {head}
             </header>
             {error && <div className="page-error">{error}</div>}
-            {children}
+            <div className="page-body">
+                <div className="page-main">{children}</div>
+                {rail}
+            </div>
         </>
     )
 }
