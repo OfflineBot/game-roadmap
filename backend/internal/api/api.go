@@ -5,6 +5,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,20 +13,23 @@ import (
 	"roadmap/internal/store"
 )
 
-// ErrorHandler turns the store's sentinel errors into status codes.
+// ErrorHandler turns the store's sentinel errors into status codes. Unexpected
+// failures are logged and answered generically, never echoed to the client.
 func ErrorHandler(c *fiber.Ctx, err error) error {
-	status := fiber.StatusInternalServerError
 	switch {
 	case errors.Is(err, store.ErrNotFound):
-		status = fiber.StatusNotFound
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
 	case errors.Is(err, store.ErrInvalid):
-		status = fiber.StatusBadRequest
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	var fiberErr *fiber.Error
 	if errors.As(err, &fiberErr) {
-		status = fiberErr.Code
+		return c.Status(fiberErr.Code).JSON(fiber.Map{"error": fiberErr.Message})
 	}
-	return c.Status(status).JSON(fiber.Map{"error": err.Error()})
+
+	log.Printf("%s %s: %v", c.Method(), c.Path(), err)
+	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "internal error"})
 }
 
 func pathID(c *fiber.Ctx, name string) (int64, error) {

@@ -22,8 +22,12 @@ var migrations embed.FS
 // Open creates the database file and its directory if they do not exist yet and
 // applies any migration the file has not seen. Existing data is never dropped.
 func Open(path string) (*sql.DB, error) {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, fmt.Errorf("create data dir: %w", err)
+	}
+	if err := writable(dir); err != nil {
+		return nil, err
 	}
 
 	// Checked before opening, because opening creates the file.
@@ -44,6 +48,19 @@ func Open(path string) (*sql.DB, error) {
 		return nil, err
 	}
 	return conn, nil
+}
+
+// writable turns the driver's unhelpful "unable to open database file" into a
+// message that names the real problem.
+func writable(dir string) error {
+	probe := filepath.Join(dir, ".write-probe")
+	file, err := os.OpenFile(probe, os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return fmt.Errorf("the data directory %s is not writable for uid %d:%d - "+
+			"either chown it or set APP_UID/APP_GID: %w", dir, os.Getuid(), os.Getgid(), err)
+	}
+	file.Close()
+	return os.Remove(probe)
 }
 
 // migrate applies every migration file beyond the version stored in the

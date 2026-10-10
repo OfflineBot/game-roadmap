@@ -5,13 +5,30 @@ Personal tracker for a game project: milestones, asset checklists and notes.
 ## Run
 
 ```sh
-docker compose up -d
+docker compose up -d --build
 ```
 
-- http://localhost:5173 - the site
-- http://localhost:8080 - the API
+The site is on http://localhost:8080. Set `WEB_PORT` to use another port.
 
-Stop with `docker compose down`.
+Only the web container publishes a port; the API is reachable through it and
+not from the outside.
+
+### No login
+
+The app has no authentication, because it is built for a single person. On a
+machine that is reachable from the internet, put it behind something that
+restricts access - a reverse proxy with basic auth, a VPN, or a firewall rule.
+
+### If the server user is not uid 1000
+
+The backend runs as uid 1000 so the database file stays owned by a normal user.
+When the account that owns `data/` has a different id:
+
+```sh
+APP_UID=$(id -u) APP_GID=$(id -g) docker compose up -d --build
+```
+
+Without it the backend stops on start and says which directory it cannot write.
 
 ## Deploying an update
 
@@ -20,7 +37,20 @@ git pull
 docker compose up -d --build
 ```
 
-The database is never part of this. See below.
+The database is not part of this. See below.
+
+## Development
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+```
+
+The site is then on http://localhost:5173 with hot reload, the API on
+http://localhost:8081. Backend changes need the command again, frontend changes
+are picked up live.
+
+Adding a frontend dependency: `docker compose exec frontend npm install <name>`
+(`node_modules` lives in a container volume, a host install would not reach it).
 
 ## The database is safe
 
@@ -34,6 +64,7 @@ first start. Everything that could overwrite it is ruled out:
 | `docker compose down -v` | `-v` removes volumes, and a bind mount is not one |
 | Restarting the app | the schema is applied through migrations that only ever add |
 | A future schema change | migrations run once, in a transaction, after a backup is written |
+| An older build on a newer database | the backend refuses to start instead of touching it |
 | Copying the file while it runs | the server closes the database on SIGTERM, which folds the write-ahead log back into the single file |
 
 ### Migrations
@@ -69,6 +100,7 @@ backend/           Go + Fiber
   internal/store   all SQL, all validation
   internal/api     HTTP handlers and the route table
 frontend/          React + Vite + TypeScript
+  nginx.conf       serves the build, proxies /api
   src/api.ts       typed client for the API
   src/progress.ts  every derived number (done states, progress bars)
   src/pages/       one file per page
@@ -86,7 +118,3 @@ frontend/          React + Vite + TypeScript
 - Pages under General Information are saved explicitly with the Save button or
   Ctrl+S. A page with unsaved edits is marked with a dot in the list and keeps
   its edits when you switch away.
-- The frontend container runs the Vite dev server, so changes under `frontend/`
-  are live. Backend changes need `docker compose up -d --build backend`.
-- Adding a frontend dependency: `docker compose exec frontend npm install <name>`
-  (`node_modules` lives in a container volume, a host install would not reach it).

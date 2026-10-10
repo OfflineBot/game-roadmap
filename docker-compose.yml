@@ -1,22 +1,19 @@
 services:
   backend:
     build: ./backend
+    restart: unless-stopped
+    # Override APP_UID/APP_GID when the user owning ./data is not uid 1000.
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"
     environment:
       DB_PATH: /data/roadmap.db
       PORT: "8080"
     volumes:
       - ./data:/data
-    ports:
-      - "8080:8080"
 
   frontend:
     build: ./frontend
-    environment:
-      VITE_BACKEND_URL: http://backend:8080
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "${WEB_PORT:-8080}:80"
     depends_on:
       - backend

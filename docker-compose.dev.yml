@@ -1,0 +1,17 @@
+# Development: Vite with hot reload, API published for direct access.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+services:
+  backend:
+    ports:
+      - "8081:8080"
+
+  frontend:
+    build:
+      target: dev
+    environment:
+      VITE_BACKEND_URL: http://backend:8080
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports: !override
+      - "5173:5173"
