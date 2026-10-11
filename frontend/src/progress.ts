@@ -26,9 +26,9 @@ export function milestonesProgress(milestones: Milestone[]): Progress {
     return progress(milestones.filter((m) => milestoneProgress(m).complete).length, milestones.length)
 }
 
-/** The one being worked on: the last milestone that is not finished. */
+/** The one being worked on: the first milestone that is not finished. */
 export function currentMilestone(milestones: Milestone[]): Milestone | undefined {
-    return milestones.findLast((milestone) => !milestoneProgress(milestone).complete)
+    return milestones.find((milestone) => !milestoneProgress(milestone).complete)
 }
 
 export function assetProgress(asset: Asset, checklist: ChecklistItem[]): Progress {
