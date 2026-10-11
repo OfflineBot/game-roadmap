@@ -18,7 +18,8 @@ export function Layout() {
                         className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
                     >
                         <span className="nav-dot" />
-                        {page.label}
+                        <span className="nav-long">{page.label}</span>
+                        <span className="nav-short">{page.short}</span>
                     </NavLink>
                 ))}
             </nav>

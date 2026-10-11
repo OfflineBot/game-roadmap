@@ -109,3 +109,58 @@
 .page-actions {
     margin-top: var(--gap);
 }
+
+.nav-short {
+    display: none;
+}
+
+/* Phone: the navigation moves into a thumb-reachable bar at the bottom. */
+@media (max-width: 860px) {
+    .sidebar {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 40;
+        width: auto;
+        height: auto;
+        flex-direction: row;
+        gap: 2px;
+        padding: 5px;
+        border-right: none;
+        border-top: 1px solid var(--surface0);
+    }
+
+    .sidebar-title {
+        display: none;
+    }
+
+    .nav-item {
+        flex: 1;
+        flex-direction: column;
+        gap: 4px;
+        padding: 7px 2px;
+        font-size: 11px;
+    }
+
+    .nav-long {
+        display: none;
+    }
+
+    .nav-short {
+        display: inline;
+    }
+
+    .main {
+        max-width: none;
+        padding: 14px 14px 80px;
+    }
+
+    .page-head {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .page-head h1 {
+        font-size: 19px;
+    }
+}

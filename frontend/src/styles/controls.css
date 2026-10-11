@@ -210,3 +210,44 @@ input[type="checkbox"].check:checked::after {
 .btn:disabled .key-hint {
     background: rgba(17, 17, 27, 0.18);
 }
+
+/* Without a mouse there is no hover, so row actions have to stay visible. */
+@media (hover: none), (max-width: 860px) {
+    .actions {
+        opacity: 1;
+    }
+}
+
+@media (pointer: coarse) {
+    .icon-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    input[type="checkbox"].check {
+        width: 22px;
+        height: 22px;
+    }
+
+    input[type="checkbox"].check:checked::after {
+        left: 6px;
+        top: 3px;
+        width: 6px;
+        height: 11px;
+    }
+}
+
+@media (max-width: 860px) {
+    .backdrop {
+        padding: 4vh 10px 10px;
+    }
+
+    .dialog {
+        max-height: 86vh;
+        padding: 14px;
+    }
+
+    .inline-add .field {
+        max-width: none;
+    }
+}

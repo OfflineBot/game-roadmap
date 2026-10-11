@@ -7,6 +7,8 @@ import { Milestones } from './pages/Milestones'
 export interface PageRoute {
     path: string
     label: string
+    /** Used where the full label does not fit, such as the phone tab bar. */
+    short: string
     accent: string
     element: ReactNode
 }
@@ -16,8 +18,8 @@ export function accentStyle(accent: string): CSSProperties {
 }
 
 export const pages: PageRoute[] = [
-    { path: '/', label: 'Dashboard', accent: '--mauve', element: <Dashboard /> },
-    { path: '/milestones', label: 'Milestones', accent: '--blue', element: <Milestones /> },
-    { path: '/items', label: 'Item Track List', accent: '--green', element: <Items /> },
-    { path: '/docs', label: 'General Information', accent: '--peach', element: <Docs /> },
+    { path: '/', label: 'Dashboard', short: 'Home', accent: '--mauve', element: <Dashboard /> },
+    { path: '/milestones', label: 'Milestones', short: 'Roadmap', accent: '--blue', element: <Milestones /> },
+    { path: '/items', label: 'Item Track List', short: 'Items', accent: '--green', element: <Items /> },
+    { path: '/docs', label: 'General Information', short: 'Info', accent: '--peach', element: <Docs /> },
 ]

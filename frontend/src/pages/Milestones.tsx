@@ -11,7 +11,7 @@ import { RowActions } from '../components/RowActions'
 import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useHotkeys } from '../hooks/useHotkeys'
 import { useResource } from '../hooks/useResource'
-import { milestoneProgress, milestonesProgress } from '../progress'
+import { currentMilestone, milestoneProgress, milestonesProgress } from '../progress'
 import type { Milestone, Task } from '../types'
 
 type Editing =
@@ -48,6 +48,8 @@ export function Milestones() {
     const remove = useConfirmDelete()
 
     const milestones = data ?? []
+    // Only the milestone being worked on is open to begin with.
+    const currentId = currentMilestone(milestones)?.id
     const hotkeys = useMemo(() => ({ n: () => setEditing({ kind: 'new-milestone' }) }), [])
     useHotkeys(hotkeys)
 
@@ -90,7 +92,7 @@ export function Milestones() {
             <div className="stack">
                 {milestones.map((milestone, index) => {
                     const progress = milestoneProgress(milestone)
-                    const open = expanded[milestone.id] ?? !progress.complete
+                    const open = expanded[milestone.id] ?? milestone.id === currentId
 
                     return (
                         <section className="card" key={milestone.id} id={`milestone-${milestone.id}`}>

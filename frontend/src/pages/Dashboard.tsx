@@ -6,7 +6,7 @@ import { Page } from '../components/Page'
 import { ProgressBar } from '../components/ProgressBar'
 import { useResource } from '../hooks/useResource'
 import { accentStyle, pages, type PageRoute } from '../pages'
-import { activeMilestone, categoriesProgress, categoryProgress, milestoneProgress, milestonesProgress } from '../progress'
+import { currentMilestone, categoriesProgress, categoryProgress, milestoneProgress, milestonesProgress } from '../progress'
 
 function card(path: string): PageRoute {
     return pages.find((page) => page.path === path) ?? pages[0]
@@ -33,7 +33,7 @@ export function Dashboard() {
     const allCategories = categories.data ?? []
     const allDocuments = documents.data ?? []
 
-    const current = activeMilestone(allMilestones)
+    const current = currentMilestone(allMilestones)
     const openTasks = allMilestones.reduce(
         (total, milestone) => total + milestone.tasks.filter((task) => !task.done).length,
         0,

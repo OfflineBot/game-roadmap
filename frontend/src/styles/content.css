@@ -247,7 +247,7 @@ button.title:hover {
 
 .dash-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
     gap: var(--gap);
     align-items: start;
 }
@@ -511,4 +511,65 @@ button.title:hover {
     flex: none;
     border-radius: 50%;
     background: var(--yellow);
+}
+
+@media (max-width: 860px) {
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Title on the first line, actions and progress on the second, instead of
+       squeezing all three into one. */
+    .card-head,
+    .subcategory-head {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .card-head .title,
+    .subcategory-head .title {
+        min-width: 55%;
+    }
+
+    .card-head .dim {
+        white-space: nowrap;
+    }
+
+    .card-head .progress,
+    .subcategory-head .progress {
+        flex: 1;
+    }
+
+    .docs-layout {
+        flex-direction: column;
+    }
+
+    .docs-list {
+        width: 100%;
+    }
+
+    .docs-editor {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* The checkboxes already say how far an asset is; the bar costs width. */
+    .items-table .progress-col {
+        display: none;
+    }
+
+    .items-table th:first-child,
+    .items-table td:first-child {
+        width: auto;
+    }
+
+    .card-head,
+    .card-body {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .subcategory {
+        padding: 8px;
+    }
 }
