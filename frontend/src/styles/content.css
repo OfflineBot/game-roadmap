@@ -298,13 +298,17 @@ button.title:hover {
 .docs-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 9px;
+    gap: 4px;
+    padding: 3px 9px 3px 4px;
     border-radius: 6px;
     color: var(--subtext0);
     font-size: 14px;
-    text-align: left;
     width: 100%;
+}
+
+.docs-item .grip {
+    width: 22px;
+    height: 22px;
 }
 
 .docs-item:hover {
@@ -321,7 +325,9 @@ button.title:hover {
 .docs-item .name {
     flex: 1;
     min-width: 0;
+    padding: 5px 0;
     overflow: hidden;
+    text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

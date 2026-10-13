@@ -23,19 +23,9 @@ func New(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 
-// Move is the body of every reorder endpoint.
+// Move is the body of every reorder endpoint: the index the row ends up at.
 type Move struct {
-	Direction string `json:"direction"`
-}
-
-func (m Move) up() (bool, error) {
-	switch m.Direction {
-	case "up":
-		return true, nil
-	case "down":
-		return false, nil
-	}
-	return false, fmt.Errorf(`%w: direction must be "up" or "down"`, ErrInvalid)
+	To *int `json:"to"`
 }
 
 // group identifies the rows a position is counted within: all milestones, the
@@ -55,12 +45,11 @@ func (s *Store) appendPosition(g group) (int, error) {
 	return pos, nil
 }
 
-// move shifts one row a single step inside its group. Positions are rewritten
-// gap-free afterwards, which also repairs any older ordering.
+// move puts one row at the given index inside its group. Positions are
+// rewritten gap-free afterwards, which also repairs any older ordering.
 func (s *Store) move(g group, id int64, m Move) error {
-	up, err := m.up()
-	if err != nil {
-		return err
+	if m.To == nil || *m.To < 0 {
+		return fmt.Errorf("%w: to must be a position", ErrInvalid)
 	}
 
 	q := fmt.Sprintf("SELECT id FROM %s WHERE %s ORDER BY position, id", g.table, g.where)
@@ -92,14 +81,12 @@ func (s *Store) move(g group, id int64, m Move) error {
 	if at < 0 {
 		return ErrNotFound
 	}
-	to := at + 1
-	if up {
-		to = at - 1
-	}
-	if to < 0 || to >= len(ids) {
+	to := min(*m.To, len(ids)-1)
+	if to == at {
 		return nil
 	}
-	ids[at], ids[to] = ids[to], ids[at]
+	ids = append(ids[:at], ids[at+1:]...)
+	ids = append(ids[:to], append([]int64{id}, ids[to:]...)...)
 
 	return s.tx(func(tx *sql.Tx) error {
 		update := fmt.Sprintf("UPDATE %s SET position = ? WHERE id = ?", g.table)

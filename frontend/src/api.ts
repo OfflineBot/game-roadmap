@@ -1,4 +1,4 @@
-import type { Asset, Category, ChecklistItem, Direction, Doc, Milestone, Task } from './types'
+import type { Asset, Category, ChecklistItem, Doc, Milestone, Task } from './types'
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const response = await fetch(`/api${path}`, {
@@ -18,7 +18,7 @@ interface Resource<T, Create, Patch> {
     create: (input: Create) => Promise<{ id: number }>
     update: (id: number, patch: Patch) => Promise<void>
     remove: (id: number) => Promise<void>
-    move: (id: number, direction: Direction) => Promise<void>
+    move: (id: number, to: number) => Promise<void>
 }
 
 function resource<T, Create, Patch>(path: string): Resource<T, Create, Patch> {
@@ -27,7 +27,7 @@ function resource<T, Create, Patch>(path: string): Resource<T, Create, Patch> {
         create: (input) => request('POST', `/${path}`, input),
         update: (id, patch) => request('PATCH', `/${path}/${id}`, patch),
         remove: (id) => request('DELETE', `/${path}/${id}`),
-        move: (id, direction) => request('POST', `/${path}/${id}/move`, { direction }),
+        move: (id, to) => request('POST', `/${path}/${id}/move`, { to }),
     }
 }
 

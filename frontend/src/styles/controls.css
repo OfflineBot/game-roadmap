@@ -68,8 +68,37 @@
 }
 
 .hoverable:hover .actions,
-.actions:focus-within {
+.actions:focus-within,
+/* The pointer leaves the row while dragging, so keep its controls up. */
+[data-row="dragging"] .actions {
     opacity: 1;
+}
+
+.grip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    flex: none;
+    border-radius: 6px;
+    color: var(--overlay0);
+    cursor: grab;
+    touch-action: none;
+}
+
+.grip:hover {
+    background: var(--surface0);
+    color: var(--text);
+}
+
+[data-row="dragging"] {
+    opacity: 0.55;
+}
+
+[data-row="dragging"] .grip {
+    cursor: grabbing;
+    color: var(--text);
 }
 
 .field {
@@ -219,7 +248,8 @@ input[type="checkbox"].check:checked::after {
 }
 
 @media (pointer: coarse) {
-    .icon-btn {
+    .icon-btn,
+    .grip {
         width: 34px;
         height: 34px;
     }

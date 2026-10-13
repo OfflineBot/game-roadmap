@@ -11,6 +11,7 @@ import { RowActions } from '../components/RowActions'
 import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useHotkeys } from '../hooks/useHotkeys'
 import { useResource } from '../hooks/useResource'
+import { useSortable } from '../hooks/useSortable'
 import { currentMilestone, milestoneProgress, milestonesProgress } from '../progress'
 import type { Milestone, Task } from '../types'
 
@@ -50,6 +51,10 @@ export function Milestones() {
     const milestones = data ?? []
     // Only the milestone being worked on is open to begin with.
     const currentId = currentMilestone(milestones)?.id
+    const sort = useSortable()
+    const order = sort.list('milestones', milestones, (from, to) =>
+        run(() => api.milestones.move(milestones[from].id, to)),
+    )
     const hotkeys = useMemo(() => ({ n: () => setEditing({ kind: 'new-milestone' }) }), [])
     useHotkeys(hotkeys)
 
@@ -90,12 +95,20 @@ export function Milestones() {
             }
         >
             <div className="stack">
-                {milestones.map((milestone, index) => {
+                {order.items.map((milestone, index) => {
                     const progress = milestoneProgress(milestone)
                     const open = expanded[milestone.id] ?? milestone.id === currentId
+                    const tasks = sort.list(`tasks-${milestone.id}`, milestone.tasks, (from, to) =>
+                        run(() => api.tasks.move(milestone.tasks[from].id, to)),
+                    )
 
                     return (
-                        <section className="card" key={milestone.id} id={`milestone-${milestone.id}`}>
+                        <section
+                            className="card"
+                            key={milestone.id}
+                            id={`milestone-${milestone.id}`}
+                            {...order.row(index)}
+                        >
                             <div className="card-head hoverable">
                                 <button
                                     type="button"
@@ -118,9 +131,7 @@ export function Milestones() {
                                 {progress.complete && <span className="badge done">done</span>}
                                 <RowActions
                                     name="milestone"
-                                    first={index === 0}
-                                    last={index === milestones.length - 1}
-                                    onMove={(direction) => run(() => api.milestones.move(milestone.id, direction))}
+                                    handle={order.handle}
                                     onEdit={() => setEditing({ kind: 'milestone', milestone })}
                                     onDelete={() =>
                                         remove.ask({
@@ -137,8 +148,8 @@ export function Milestones() {
                             {open && (
                                 <div className="card-body">
                                     <RichTextView html={milestone.description} compact />
-                                    {milestone.tasks.map((task, taskIndex) => (
-                                        <div className="task hoverable" key={task.id}>
+                                    {tasks.items.map((task, taskIndex) => (
+                                        <div className="task hoverable" key={task.id} {...tasks.row(taskIndex)}>
                                             <input
                                                 type="checkbox"
                                                 className="check"
@@ -158,9 +169,7 @@ export function Milestones() {
                                                     </button>
                                                     <RowActions
                                                         name="task"
-                                                        first={taskIndex === 0}
-                                                        last={taskIndex === milestone.tasks.length - 1}
-                                                        onMove={(direction) => run(() => api.tasks.move(task.id, direction))}
+                                                        handle={tasks.handle}
                                                         onEdit={() => setEditing({ kind: 'task', task })}
                                                         onDelete={() =>
                                                             remove.ask({

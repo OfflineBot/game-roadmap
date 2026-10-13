@@ -10,8 +10,9 @@ import { RichTextView } from '../components/RichTextView'
 import { RowActions } from '../components/RowActions'
 import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useResource } from '../hooks/useResource'
+import { useSortable, type SortableList } from '../hooks/useSortable'
 import { assetProgress, categoriesProgress, categoryProgress, countAssets } from '../progress'
-import type { Asset, Category, ChecklistItem, Direction } from '../types'
+import type { Asset, Category, ChecklistItem } from '../types'
 
 function assetCount(category: Category): string {
     const count = countAssets(category)
@@ -25,21 +26,20 @@ type Editing =
 
 interface AssetHandlers {
     onCheck: (asset: Asset, itemId: number, checked: boolean) => void
-    onMove: (asset: Asset, direction: Direction) => void
     onEdit: (asset: Asset) => void
     onDelete: (asset: Asset) => void
 }
 
 interface AssetTableProps extends AssetHandlers {
-    assets: Asset[]
+    assets: SortableList<Asset>
     checklist: ChecklistItem[]
     onAdd: (name: string) => void
 }
 
-function AssetTable({ assets, checklist, onAdd, onCheck, onMove, onEdit, onDelete }: AssetTableProps) {
+function AssetTable({ assets, checklist, onAdd, onCheck, onEdit, onDelete }: AssetTableProps) {
     return (
         <>
-            {assets.length > 0 && (
+            {assets.items.length > 0 && (
                 <div className="table-scroll">
                 <table className="items-table">
                     <thead>
@@ -55,8 +55,8 @@ function AssetTable({ assets, checklist, onAdd, onCheck, onMove, onEdit, onDelet
                         </tr>
                     </thead>
                     <tbody>
-                        {assets.map((asset, index) => (
-                            <tr key={asset.id} className="hoverable">
+                        {assets.items.map((asset, index) => (
+                            <tr key={asset.id} className="hoverable" {...assets.row(index)}>
                                 <td>
                                     <button type="button" className="title" onClick={() => onEdit(asset)}>
                                         {asset.name}
@@ -87,9 +87,7 @@ function AssetTable({ assets, checklist, onAdd, onCheck, onMove, onEdit, onDelet
                                 <td className="actions-col">
                                     <RowActions
                                         name="asset"
-                                        first={index === 0}
-                                        last={index === assets.length - 1}
-                                        onMove={(direction) => onMove(asset, direction)}
+                                        handle={assets.handle}
                                         onEdit={() => onEdit(asset)}
                                         onDelete={() => onDelete(asset)}
                                     />
@@ -112,10 +110,17 @@ export function Items() {
     const remove = useConfirmDelete()
 
     const categories = data ?? []
+    const sort = useSortable()
+    const order = sort.list('categories', categories, (from, to) =>
+        run(() => api.categories.move(categories[from].id, to)),
+    )
+    const assetsOf = (category: Category) =>
+        sort.list(`assets-${category.id}`, category.assets, (from, to) =>
+            run(() => api.assets.move(category.assets[from].id, to)),
+        )
 
     const handlers: AssetHandlers = {
         onCheck: (asset, itemId, checked) => run(() => api.assets.setCheck(asset.id, itemId, checked)),
-        onMove: (asset, direction) => run(() => api.assets.move(asset.id, direction)),
         onEdit: (asset) => setEditing({ kind: 'asset', asset }),
         onDelete: (asset) =>
             remove.ask({
@@ -171,11 +176,19 @@ export function Items() {
             }
         >
             <div className="stack">
-                {categories.map((category, index) => {
+                {order.items.map((category, index) => {
                     const open = !collapsed[category.id]
+                    const children = sort.list(`children-${category.id}`, category.children, (from, to) =>
+                        run(() => api.categories.move(category.children[from].id, to)),
+                    )
 
                     return (
-                    <section className="card" key={category.id} id={`category-${category.id}`}>
+                    <section
+                        className="card"
+                        key={category.id}
+                        id={`category-${category.id}`}
+                        {...order.row(index)}
+                    >
                         <div className="card-head hoverable">
                             <button
                                 type="button"
@@ -195,9 +208,7 @@ export function Items() {
                             <span className="dim">{assetCount(category)}</span>
                             <RowActions
                                 name="category"
-                                first={index === 0}
-                                last={index === categories.length - 1}
-                                onMove={(direction) => run(() => api.categories.move(category.id, direction))}
+                                handle={order.handle}
                                 onEdit={() => setEditing({ kind: 'category', category })}
                                 onDelete={() => removeCategory(category, 'category')}
                             />
@@ -241,14 +252,14 @@ export function Items() {
                             </div>
 
                             <AssetTable
-                                assets={category.assets}
+                                assets={assetsOf(category)}
                                 checklist={category.checklist}
                                 onAdd={(name) => run(() => api.categories.createAsset(category.id, name))}
                                 {...handlers}
                             />
 
-                            {category.children.map((child, childIndex) => (
-                                <div className="subcategory" key={child.id}>
+                            {children.items.map((child, childIndex) => (
+                                <div className="subcategory" key={child.id} {...children.row(childIndex)}>
                                     <div className="subcategory-head hoverable">
                                         <span className="tag">Subcategory</span>
                                         <button
@@ -260,9 +271,7 @@ export function Items() {
                                         </button>
                                         <RowActions
                                             name="subcategory"
-                                            first={childIndex === 0}
-                                            last={childIndex === category.children.length - 1}
-                                            onMove={(direction) => run(() => api.categories.move(child.id, direction))}
+                                            handle={children.handle}
                                             onEdit={() => setEditing({ kind: 'category', category: child })}
                                             onDelete={() => removeCategory(child, 'subcategory')}
                                         />
@@ -270,7 +279,7 @@ export function Items() {
                                         <ProgressBar value={categoryProgress(child, category.checklist)} width={220} />
                                     </div>
                                     <AssetTable
-                                        assets={child.assets}
+                                        assets={assetsOf(child)}
                                         checklist={category.checklist}
                                         onAdd={(name) => run(() => api.categories.createAsset(child.id, name))}
                                         {...handlers}

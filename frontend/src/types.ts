@@ -1,5 +1,3 @@
-export type Direction = 'up' | 'down'
-
 export interface Task {
     id: number
     number: string

@@ -7,6 +7,7 @@ const paths = {
     right: 'M9 6l6 6-6 6',
     close: 'M6 6l12 12M18 6L6 18',
     reset: 'M5 12h14',
+    grip: 'M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01',
 } as const
 
 export type IconName = keyof typeof paths

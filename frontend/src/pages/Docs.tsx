@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import * as api from '../api'
+import { DragHandle } from '../components/DragHandle'
 import { IconButton } from '../components/IconButton'
 import { InlineAdd } from '../components/InlineAdd'
 import { Page } from '../components/Page'
 import { RichText } from '../components/RichText'
 import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useResource } from '../hooks/useResource'
+import { useSortable } from '../hooks/useSortable'
 import type { Doc } from '../types'
 
 interface Draft {
@@ -26,6 +28,13 @@ export function Docs() {
 
     const documents = data ?? []
     const selected = documents.find((page) => page.id === selectedId) ?? documents[0] ?? null
+    const sort = useSortable()
+    const order = sort.list('documents', documents, (from, to) => {
+        // Without a pick of their own the editor follows the first page, so
+        // reordering would pull it away from the page being read.
+        if (selected) setSelectedId(selected.id)
+        return run(() => api.docs.move(documents[from].id, to))
+    })
     const draft = selected ? drafts[selected.id] : undefined
     const value: Draft | null = draft ?? (selected ? { title: selected.title, content: selected.content } : null)
     const unsaved = selected ? changed(selected, draft) : false
@@ -56,22 +65,22 @@ export function Docs() {
         return () => window.removeEventListener('keydown', onKeyDown)
     }, [save])
 
-    const index = documents.findIndex((page) => page.id === selected?.id)
-
     return (
         <Page title="General Information" error={error}>
             <div className="docs-layout">
                 <aside className="card docs-list">
-                    {documents.map((page) => (
-                        <button
-                            type="button"
+                    {order.items.map((page, index) => (
+                        <div
                             key={page.id}
                             className={page.id === selected?.id ? 'docs-item active' : 'docs-item'}
-                            onClick={() => setSelectedId(page.id)}
+                            {...order.row(index)}
                         >
-                            <span className="name">{page.title}</span>
+                            <DragHandle name="page" {...order.handle} />
+                            <button type="button" className="name" onClick={() => setSelectedId(page.id)}>
+                                {page.title}
+                            </button>
                             {changed(page, drafts[page.id]) && <span className="unsaved-dot" title="Unsaved" />}
-                        </button>
+                        </div>
                     ))}
                     <InlineAdd
                         label="page"
@@ -92,18 +101,6 @@ export function Docs() {
                                     onChange={(event) => edit({ title: event.target.value })}
                                 />
                                 <div className="actions">
-                                    <IconButton
-                                        icon="up"
-                                        title="Move page up"
-                                        disabled={index <= 0}
-                                        onClick={() => run(() => api.docs.move(selected.id, 'up'))}
-                                    />
-                                    <IconButton
-                                        icon="down"
-                                        title="Move page down"
-                                        disabled={index === documents.length - 1}
-                                        onClick={() => run(() => api.docs.move(selected.id, 'down'))}
-                                    />
                                     <IconButton
                                         icon="trash"
                                         title="Delete page"
