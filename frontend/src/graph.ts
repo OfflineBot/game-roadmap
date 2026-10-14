@@ -31,22 +31,45 @@ export function rows(crates: Crate[]): Crate[][] {
 }
 
 /**
- * Keeps a crate close to the ones it imports, which is what turns a bundle of
- * crossing arrows into something readable.
+ * Keeps a crate close to the ones it imports and to the ones importing it,
+ * which is what turns a bundle of crossing arrows into something readable.
+ * Two sweeps in each direction are enough to settle a workspace this size.
  */
 function straighten(layers: Crate[][]): Crate[][] {
     const spot = new Map<number, number>()
-
-    layers.forEach((row, index) => {
-        if (index > 0) {
-            const pull = (crate: Crate) => {
-                const places = crate.depends_on.map((id) => spot.get(id)).filter((at) => at !== undefined)
-                return places.length === 0 ? 0.5 : places.reduce((sum, at) => sum + at, 0) / places.length
+    const importers = new Map<number, number[]>()
+    for (const row of layers) {
+        for (const crate of row) {
+            for (const id of crate.depends_on) {
+                importers.set(id, [...(importers.get(id) ?? []), crate.id])
             }
-            row.sort((a, b) => pull(a) - pull(b) || a.name.localeCompare(b.name))
         }
+    }
+
+    const place = (row: Crate[]) =>
         row.forEach((crate, at) => spot.set(crate.id, row.length === 1 ? 0.5 : at / (row.length - 1)))
-    })
+    layers.forEach(place)
+
+    // A crate with no neighbour to line up with keeps the place it has.
+    const middle = (ids: number[], stay: number) => {
+        const places = ids.map((id) => spot.get(id)).filter((at) => at !== undefined)
+        return places.length === 0 ? stay : places.reduce((sum, at) => sum + at, 0) / places.length
+    }
+
+    const sweep = (row: Crate[], neighbours: (crate: Crate) => number[]) => {
+        const pull = new Map(row.map((crate) => [crate.id, middle(neighbours(crate), spot.get(crate.id) ?? 0.5)]))
+        row.sort((a, b) => (pull.get(a.id) ?? 0) - (pull.get(b.id) ?? 0) || a.name.localeCompare(b.name))
+        place(row)
+    }
+
+    for (let pass = 0; pass < 2; pass++) {
+        for (let row = 1; row < layers.length; row++) {
+            sweep(layers[row], (crate) => crate.depends_on)
+        }
+        for (let row = layers.length - 2; row >= 0; row--) {
+            sweep(layers[row], (crate) => importers.get(crate.id) ?? [])
+        }
+    }
     return layers
 }
 

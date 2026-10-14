@@ -45,6 +45,19 @@
     stroke-width: 2;
 }
 
+/* While one crate is traced, everything unrelated steps back. */
+.graph.tracing .edge {
+    opacity: 0.15;
+}
+
+.graph.tracing .edge.on {
+    opacity: 1;
+}
+
+.node.aside {
+    opacity: 0.35;
+}
+
 .graph-row {
     display: flex;
     flex-wrap: wrap;
