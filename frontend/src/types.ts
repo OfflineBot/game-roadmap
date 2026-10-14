@@ -41,3 +41,9 @@ export interface Doc {
     content: string
     updated_at: string
 }
+
+export interface Crate {
+    id: number
+    name: string
+    depends_on: number[]
+}

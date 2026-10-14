@@ -1,4 +1,4 @@
-import type { Asset, Category, ChecklistItem, Doc, Milestone, Task } from './types'
+import type { Asset, Category, ChecklistItem, Crate, Doc, Milestone, Task } from './types'
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const response = await fetch(`/api${path}`, {
@@ -61,3 +61,14 @@ export const assets = {
 }
 
 export const docs = resource<Doc, { title: string }, { title?: string; content?: string }>('documents')
+
+export const crates = {
+    list: () => request<Crate[]>('GET', '/crates'),
+    create: (input: { name: string }) => request<{ id: number }>('POST', '/crates', input),
+    update: (id: number, patch: { name: string }) => request<void>('PATCH', `/crates/${id}`, patch),
+    remove: (id: number) => request<void>('DELETE', `/crates/${id}`),
+    addImport: (id: number, importedId: number) =>
+        request<void>('POST', `/crates/${id}/deps`, { depends_on_id: importedId }),
+    removeImport: (id: number, importedId: number) =>
+        request<void>('DELETE', `/crates/${id}/deps/${importedId}`),
+}

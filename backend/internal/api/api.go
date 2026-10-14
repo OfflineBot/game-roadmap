@@ -48,7 +48,7 @@ func parseBody[T any](c *fiber.Ctx) (T, error) {
 	return body, nil
 }
 
-// The five handler shapes every endpoint of this API fits into.
+// The six handler shapes every endpoint of this API fits into.
 
 func read[T any](fn func() (T, error)) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -103,6 +103,25 @@ func update[T any](fn func(int64, T) error) fiber.Handler {
 			return err
 		}
 		if err := fn(id, body); err != nil {
+			return err
+		}
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
+
+// removeIn deletes a row that two ids identify together, such as one edge of
+// the crate graph.
+func removeIn(fn func(int64, int64) error) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id, err := pathID(c, "id")
+		if err != nil {
+			return err
+		}
+		child, err := pathID(c, "dep")
+		if err != nil {
+			return err
+		}
+		if err := fn(id, child); err != nil {
 			return err
 		}
 		return c.SendStatus(fiber.StatusNoContent)

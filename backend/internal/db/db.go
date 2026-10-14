@@ -241,17 +241,18 @@ func backup(conn *sql.DB, path string, version int) error {
 
 // report makes it visible in the deployment log that the content is still there.
 func report(conn *sql.DB, path string) error {
-	var milestones, tasks, assets, documents int
+	var milestones, tasks, assets, documents, crates int
 	err := conn.QueryRow(`SELECT
         (SELECT COUNT(*) FROM milestones),
         (SELECT COUNT(*) FROM tasks),
         (SELECT COUNT(*) FROM assets),
-        (SELECT COUNT(*) FROM documents)`).Scan(&milestones, &tasks, &assets, &documents)
+        (SELECT COUNT(*) FROM documents),
+        (SELECT COUNT(*) FROM crates)`).Scan(&milestones, &tasks, &assets, &documents, &crates)
 	if err != nil {
 		return err
 	}
-	log.Printf("%s ready: %d milestones, %d tasks, %d assets, %d pages",
-		path, milestones, tasks, assets, documents)
+	log.Printf("%s ready: %d milestones, %d tasks, %d assets, %d pages, %d crates",
+		path, milestones, tasks, assets, documents, crates)
 	return nil
 }
 

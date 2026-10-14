@@ -41,6 +41,13 @@ func Register(app *fiber.App, s *store.Store) {
 	api.Post("/assets/:id/move", update(s.MoveAsset))
 	api.Put("/assets/:id/check", update(s.SetAssetCheck))
 
+	api.Get("/crates", read(s.Crates))
+	api.Post("/crates", create(s.CreateCrate))
+	api.Patch("/crates/:id", update(s.UpdateCrate))
+	api.Delete("/crates/:id", remove(s.DeleteCrate))
+	api.Post("/crates/:id/deps", update(s.AddDependency))
+	api.Delete("/crates/:id/deps/:dep", removeIn(s.RemoveDependency))
+
 	api.Get("/documents", read(s.Documents))
 	api.Post("/documents", create(s.CreateDocument))
 	api.Patch("/documents/:id", update(s.UpdateDocument))

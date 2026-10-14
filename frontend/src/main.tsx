@@ -7,6 +7,7 @@ import './styles/layout.css'
 import './styles/controls.css'
 import './styles/editor.css'
 import './styles/content.css'
+import './styles/graph.css'
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
