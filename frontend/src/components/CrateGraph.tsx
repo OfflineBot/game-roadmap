@@ -26,9 +26,14 @@ function anchor(box: Box, index: number, total: number): number {
     return box.x - span / 2 + (span * index) / (total - 1)
 }
 
-function curve(fromX: number, from: Box, toX: number, to: Box): string {
-    const bend = Math.max(22, (from.top - to.bottom) * 0.35)
-    return `M ${fromX} ${from.top} C ${fromX} ${from.top - bend} ${toX} ${to.bottom + bend} ${toX} ${to.bottom + 4}`
+/** Runs from the imported crate down into the one that imports it. */
+function curve(importerX: number, importer: Box, importedX: number, imported: Box): string {
+    const bend = Math.max(22, (importer.top - imported.bottom) * 0.35)
+    return (
+        `M ${importedX} ${imported.bottom}` +
+        ` C ${importedX} ${imported.bottom + bend} ${importerX} ${importer.top - bend}` +
+        ` ${importerX} ${importer.top - 4}`
+    )
 }
 
 /** Edge ends are ordered across a crate by where the other end sits. */

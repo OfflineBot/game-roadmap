@@ -90,7 +90,7 @@ export function Crates() {
                     </>
                 ) : (
                     <span className="dim">
-                        Arrows point at what a crate imports. Click a crate to connect it.
+                        Every crate sits above the ones that import it. Click a crate to connect it.
                     </span>
                 )}
             </div>
