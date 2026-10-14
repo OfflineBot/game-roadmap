@@ -21,13 +21,38 @@ export function rows(crates: Crate[]): Crate[][] {
         return value
     }
 
+    for (const crate of crates) depth(crate)
+    tighten(crates, depths)
+
     const layers: Crate[][] = []
     for (const crate of crates) {
-        const row = depth(crate)
+        const row = depths.get(crate.id) ?? 0
         while (layers.length <= row) layers.push([])
         layers[row].push(crate)
     }
-    return straighten(layers)
+    return straighten(layers.filter((row) => row.length > 0))
+}
+
+/**
+ * Counting from the deepest import alone leaves a crate stranded rows above
+ * whatever uses it - a crate only `game` needs would sit at the very top. This
+ * drops each one to just above its lowest importer, which keeps arrows short.
+ */
+function tighten(crates: Crate[], depths: Map<number, number>): void {
+    const importers = new Map<number, number[]>()
+    for (const crate of crates) {
+        for (const id of crate.depends_on) {
+            importers.set(id, [...(importers.get(id) ?? []), crate.id])
+        }
+    }
+
+    // Deepest first, so a crate is placed after everything that imports it.
+    const order = [...crates].sort((a, b) => (depths.get(b.id) ?? 0) - (depths.get(a.id) ?? 0))
+    for (const crate of order) {
+        const above = importers.get(crate.id) ?? []
+        if (above.length === 0) continue
+        depths.set(crate.id, Math.min(...above.map((id) => depths.get(id) ?? 0)) - 1)
+    }
 }
 
 /**
