@@ -17,11 +17,16 @@
     color: var(--text);
 }
 
+/* The bar is the one place a crate is acted on, so its buttons always show. */
+.connect-bar .actions {
+    opacity: 1;
+}
+
 .graph {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 52px;
+    gap: 60px;
     padding: 6px 0 10px;
 }
 
@@ -58,32 +63,30 @@
     opacity: 0.35;
 }
 
+/* An import another path already spells out stays visible but quiet. */
+.edge.faint {
+    opacity: 0.13;
+}
+
 .graph-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px 16px;
+    gap: 12px 24px;
 }
 
 .node {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 3px 5px 3px 12px;
+    padding: 6px 13px;
     border: 1px solid var(--surface0);
     border-radius: 999px;
     background: var(--mantle);
-}
-
-.node:hover .actions {
-    opacity: 1;
-}
-
-.node-name {
-    padding: 4px 2px;
     font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
+}
+
+.node:hover {
+    border-color: var(--subtext0);
 }
 
 .node.picked {
@@ -102,15 +105,16 @@
 
 .node.blocked {
     opacity: 0.3;
-}
-
-.node.blocked .node-name {
     cursor: not-allowed;
 }
 
 @media (max-width: 860px) {
     .graph {
-        gap: 44px;
+        gap: 46px;
+    }
+
+    .graph-row {
+        gap: 10px 14px;
     }
 
     .connect-bar {

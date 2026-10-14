@@ -73,6 +73,32 @@ function straighten(layers: Crate[][]): Crate[][] {
     return layers
 }
 
+/**
+ * Imports that another path already spells out: if a crate imports both entity
+ * and game while entity imports game, the arrow straight to game only repeats
+ * what the picture says anyway. They are drawn, but faintly.
+ */
+export function implied(crates: Crate[]): Set<string> {
+    const byId = new Map(crates.map((crate) => [crate.id, crate]))
+
+    const reaches = (from: number, to: number, seen: Set<number>): boolean => {
+        if (seen.has(from)) return false
+        seen.add(from)
+        return (byId.get(from)?.depends_on ?? []).some((id) => id === to || reaches(id, to, seen))
+    }
+
+    const repeats = new Set<string>()
+    for (const crate of crates) {
+        for (const id of crate.depends_on) {
+            const overAnother = crate.depends_on.some(
+                (other) => other !== id && reaches(other, id, new Set()),
+            )
+            if (overAnother) repeats.add(`${crate.id}-${id}`)
+        }
+    }
+    return repeats
+}
+
 /** Whether adding this import would let a crate end up importing itself. */
 export function wouldBeCircular(crates: Crate[], importer: number, imported: number): boolean {
     if (importer === imported) return true

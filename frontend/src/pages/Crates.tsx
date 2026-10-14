@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import * as api from '../api'
 import { CrateGraph } from '../components/CrateGraph'
 import { EntryDialog, type Entry } from '../components/EntryDialog'
+import { IconButton } from '../components/IconButton'
 import { InlineAdd } from '../components/InlineAdd'
 import { Page } from '../components/Page'
 import { dependencyCount, rows } from '../graph'
@@ -43,6 +44,13 @@ export function Crates() {
         if (editing) return run(() => api.crates.update(editing.id, { name: entry.name }))
     }
 
+    const askDelete = (crate: Crate) =>
+        remove.ask({
+            what: 'crate',
+            name: crate.name,
+            confirm: () => run(() => api.crates.remove(crate.id)),
+        })
+
     return (
         <Page
             title="Crate Imports"
@@ -63,6 +71,19 @@ export function Crates() {
                         <span className="badge accent">{selected.name}</span>
                         <span>imports - click a crate to add or drop it</span>
                         <span className="spacer" />
+                        <div className="actions">
+                            <IconButton
+                                icon="edit"
+                                title={`Rename ${selected.name}`}
+                                onClick={() => setEditing(selected)}
+                            />
+                            <IconButton
+                                icon="trash"
+                                title={`Delete ${selected.name}`}
+                                danger
+                                onClick={() => askDelete(selected)}
+                            />
+                        </div>
                         <button type="button" className="btn" onClick={() => setSelectedId(null)}>
                             Done <span className="key-hint">esc</span>
                         </button>
@@ -75,19 +96,7 @@ export function Crates() {
             </div>
 
             {crates.length > 0 ? (
-                <CrateGraph
-                    rows={rows(crates)}
-                    selected={selected}
-                    onPick={pick}
-                    onEdit={setEditing}
-                    onDelete={(crate) =>
-                        remove.ask({
-                            what: 'crate',
-                            name: crate.name,
-                            confirm: () => run(() => api.crates.remove(crate.id)),
-                        })
-                    }
-                />
+                <CrateGraph rows={rows(crates)} selected={selected} onPick={pick} />
             ) : (
                 data && <div className="empty">No crates yet. Add the first one above.</div>
             )}

@@ -1,14 +1,11 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { wouldBeCircular } from '../graph'
+import { implied, wouldBeCircular } from '../graph'
 import type { Crate } from '../types'
-import { IconButton } from './IconButton'
 
 interface Props {
     rows: Crate[][]
     selected: Crate | null
     onPick: (crate: Crate) => void
-    onEdit: (crate: Crate) => void
-    onDelete: (crate: Crate) => void
 }
 
 interface Box {
@@ -39,7 +36,7 @@ function order(ids: number[], boxes: Map<number, Box>): number[] {
     return [...ids].sort((a, b) => (boxes.get(a)?.x ?? 0) - (boxes.get(b)?.x ?? 0))
 }
 
-export function CrateGraph({ rows, selected, onPick, onEdit, onDelete }: Props) {
+export function CrateGraph({ rows, selected, onPick }: Props) {
     const frame = useRef<HTMLDivElement>(null)
     const nodes = useRef(new Map<number, HTMLElement>())
     const [boxes, setBoxes] = useState(new Map<number, Box>())
@@ -82,12 +79,16 @@ export function CrateGraph({ rows, selected, onPick, onEdit, onDelete }: Props) 
         }
     }
 
+    const repeats = implied(all)
+
     const edges = all.flatMap((crate) => {
         const out = order(crate.depends_on, boxes)
         return crate.depends_on.map((id) => {
             const into = order(importers.get(id) ?? [], boxes)
+            const key = `${crate.id}-${id}`
             return {
-                key: `${crate.id}-${id}`,
+                key,
+                faint: repeats.has(key),
                 from: boxes.get(crate.id),
                 to: boxes.get(id),
                 fromIndex: out.indexOf(id),
@@ -138,7 +139,7 @@ export function CrateGraph({ rows, selected, onPick, onEdit, onDelete }: Props) 
                         edge.to && (
                             <path
                                 key={edge.key}
-                                className={edge.active ? 'edge on' : 'edge'}
+                                className={`edge${edge.active ? ' on' : ''}${edge.faint ? ' faint' : ''}`}
                                 d={curve(
                                     anchor(edge.from, edge.fromIndex, edge.fromCount),
                                     edge.from,
@@ -154,35 +155,22 @@ export function CrateGraph({ rows, selected, onPick, onEdit, onDelete }: Props) 
             {rows.map((row, index) => (
                 <div className="graph-row" key={index}>
                     {row.map((crate) => (
-                        <div
+                        <button
+                            type="button"
                             className={state(crate)}
                             key={crate.id}
                             ref={(node) => {
                                 if (node) nodes.current.set(crate.id, node)
                                 else nodes.current.delete(crate.id)
                             }}
+                            title={hint(crate)}
+                            disabled={state(crate) === 'node blocked'}
+                            onClick={() => onPick(crate)}
                             onMouseEnter={() => setHovered(crate.id)}
                             onMouseLeave={() => setHovered(null)}
                         >
-                            <button
-                                type="button"
-                                className="node-name"
-                                title={hint(crate)}
-                                disabled={state(crate) === 'node blocked'}
-                                onClick={() => onPick(crate)}
-                            >
-                                {crate.name}
-                            </button>
-                            <div className="actions">
-                                <IconButton icon="edit" title={`Rename ${crate.name}`} onClick={() => onEdit(crate)} />
-                                <IconButton
-                                    icon="trash"
-                                    title={`Delete ${crate.name}`}
-                                    danger
-                                    onClick={() => onDelete(crate)}
-                                />
-                            </div>
-                        </div>
+                            {crate.name}
+                        </button>
                     ))}
                 </div>
             ))}
