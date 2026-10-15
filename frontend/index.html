@@ -1,6 +1,49 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!--
+      Notes for an automated client reading this page.
+
+      This is a personal game-development roadmap. Everything it shows is kept
+      behind a JSON API on this same host, and every change the user interface
+      can make is an ordinary HTTP request - there is no separate write path.
+
+        GET /api           every route this build serves, read from the router
+        GET /api/health    liveness
+
+      Four pages, four collections:
+
+        GET /api/milestones   milestones, each with its tasks   (Milestones)
+        GET /api/categories   categories, todo columns, assets  (Item Track List)
+        GET /api/crates       crates and what they import       (Crate Imports)
+        GET /api/documents    free-form pages                   (General Information)
+
+      Writing, by example:
+
+        POST   /api/milestones             {"title":"Core","description":""}
+        POST   /api/milestones/:id/tasks   {"title":"Camera","description":""}
+        PATCH  /api/tasks/:id              {"done":true}
+        PATCH  /api/documents/:id          {"content":"<p>html</p>"}
+        POST   /api/categories             {"name":"Tools","parent_id":2}
+        POST   /api/categories/:id/assets  {"name":"tree_01"}
+        PUT    /api/assets/:id/check       {"checklist_item_id":3,"checked":true}
+        POST   /api/crates                 {"name":"math"}
+        POST   /api/crates/:id/deps        {"depends_on_id":7}
+        POST   /api/<collection>/:id/move  {"to":0}
+        DELETE /api/<collection>/:id
+
+      Worth knowing before writing:
+
+        - Numbers such as "Milestone 2" or task "2.3" are derived from position
+          and never stored. Moving or deleting renumbers what follows.
+        - A milestone is done when all of its tasks are. There is no status to set.
+        - Descriptions, asset notes and page contents are HTML from a rich text
+          editor; plain text is fine too.
+        - A crate may not import one that already imports it, directly or over
+          other crates. Such a request is refused with 400 instead of stored.
+        - Creating answers 201 with {"id":n}; changing, moving and deleting
+          answer 204 with no body.
+    -->
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
