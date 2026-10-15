@@ -1,6 +1,9 @@
 package api
 
 import (
+	"sort"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 
 	"roadmap/internal/store"
@@ -12,6 +15,7 @@ func Register(app *fiber.App, s *store.Store) {
 	api.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
+	api.Get("/", index(app))
 
 	api.Get("/milestones", read(s.Milestones))
 	api.Post("/milestones", create(s.CreateMilestone))
@@ -53,4 +57,23 @@ func Register(app *fiber.App, s *store.Store) {
 	api.Patch("/documents/:id", update(s.UpdateDocument))
 	api.Delete("/documents/:id", remove(s.DeleteDocument))
 	api.Post("/documents/:id/move", update(s.MoveDocument))
+}
+
+// index answers GET /api with every route this build serves, read back from
+// the router itself so it cannot drift from what is registered above.
+func index(app *fiber.App) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		seen := map[string]bool{}
+		var routes []string
+		for _, r := range app.GetRoutes() {
+			line := r.Method + " " + r.Path
+			if r.Method == fiber.MethodHead || !strings.HasPrefix(r.Path, "/api") || seen[line] {
+				continue
+			}
+			seen[line] = true
+			routes = append(routes, line)
+		}
+		sort.Strings(routes)
+		return c.JSON(fiber.Map{"routes": routes})
+	}
 }
