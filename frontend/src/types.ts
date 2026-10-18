@@ -42,6 +42,14 @@ export interface Doc {
     updated_at: string
 }
 
+export interface Bug {
+    id: number
+    title: string
+    description: string
+    fixed: boolean
+    fixed_at: string | null
+}
+
 export interface Crate {
     id: number
     name: string

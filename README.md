@@ -144,3 +144,5 @@ frontend/          React + Vite + TypeScript
 - Pages under General Information are saved explicitly with the Save button or
   Ctrl+S. A page with unsaved edits is marked with a dot in the list and keeps
   its edits when you switch away.
+- Known Bugs shows the open ones; marking a bug fixed moves it into the archive
+  below, which stays collapsed until you open it. Unchecking brings it back.

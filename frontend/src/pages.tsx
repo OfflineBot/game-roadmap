@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { Bugs } from './pages/Bugs'
 import { Crates } from './pages/Crates'
 import { Dashboard } from './pages/Dashboard'
 import { Docs } from './pages/Docs'
@@ -23,5 +24,6 @@ export const pages: PageRoute[] = [
     { path: '/milestones', label: 'Milestones', short: 'Roadmap', accent: '--blue', element: <Milestones /> },
     { path: '/items', label: 'Item Track List', short: 'Items', accent: '--green', element: <Items /> },
     { path: '/crates', label: 'Crate Imports', short: 'Crates', accent: '--teal', element: <Crates /> },
+    { path: '/bugs', label: 'Known Bugs', short: 'Bugs', accent: '--red', element: <Bugs /> },
     { path: '/docs', label: 'General Information', short: 'Info', accent: '--peach', element: <Docs /> },
 ]

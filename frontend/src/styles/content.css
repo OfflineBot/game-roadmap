@@ -579,3 +579,16 @@ button.title:hover {
         padding: 8px;
     }
 }
+
+.empty-row {
+    padding: 9px 8px;
+}
+
+.archive-head {
+    width: 100%;
+    color: var(--subtext0);
+}
+
+.archive-head:hover {
+    color: var(--text);
+}

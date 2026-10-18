@@ -1,4 +1,4 @@
-import type { Asset, Category, ChecklistItem, Crate, Doc, Milestone, Task } from './types'
+import type { Asset, Bug, Category, ChecklistItem, Crate, Doc, Milestone, Task } from './types'
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const response = await fetch(`/api${path}`, {
@@ -58,6 +58,14 @@ export const assets = {
     ...resource<Asset, never, { name?: string; notes?: string }>('assets'),
     setCheck: (assetId: number, checklistItemId: number, checked: boolean) =>
         request<void>('PUT', `/assets/${assetId}/check`, { checklist_item_id: checklistItemId, checked }),
+}
+
+export const bugs = {
+    list: () => request<Bug[]>('GET', '/bugs'),
+    create: (input: Titled) => request<{ id: number }>('POST', '/bugs', input),
+    update: (id: number, patch: Partial<Titled> & { fixed?: boolean }) =>
+        request<void>('PATCH', `/bugs/${id}`, patch),
+    remove: (id: number) => request<void>('DELETE', `/bugs/${id}`),
 }
 
 export const docs = resource<Doc, { title: string }, { title?: string; content?: string }>('documents')

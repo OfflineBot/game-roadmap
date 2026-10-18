@@ -11,11 +11,12 @@
         GET /api           every route this build serves, read from the router
         GET /api/health    liveness
 
-      Four pages, four collections:
+      Five pages, five collections:
 
         GET /api/milestones   milestones, each with its tasks   (Milestones)
         GET /api/categories   categories, todo columns, assets  (Item Track List)
         GET /api/crates       crates and what they import       (Crate Imports)
+        GET /api/bugs         known bugs, open and fixed        (Known Bugs)
         GET /api/documents    free-form pages                   (General Information)
 
       Writing, by example:
@@ -29,6 +30,8 @@
         PUT    /api/assets/:id/check       {"checklist_item_id":3,"checked":true}
         POST   /api/crates                 {"name":"math"}
         POST   /api/crates/:id/deps        {"depends_on_id":7}
+        POST   /api/bugs                   {"title":"Camera clips walls","description":""}
+        PATCH  /api/bugs/:id               {"fixed":true}
         POST   /api/<collection>/:id/move  {"to":0}
         DELETE /api/<collection>/:id
 
@@ -41,6 +44,9 @@
           editor; plain text is fine too.
         - A crate may not import one that already imports it, directly or over
           other crates. Such a request is refused with 400 instead of stored.
+        - Bugs have no order of their own and no move route. Setting "fixed"
+          stamps "fixed_at" and sends the bug to the archive; clearing it
+          brings the bug back and clears the stamp.
         - Creating answers 201 with {"id":n}; changing, moving and deleting
           answer 204 with no body.
     -->
