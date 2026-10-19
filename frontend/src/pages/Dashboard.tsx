@@ -2,11 +2,23 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import * as api from '../api'
 import { Icon } from '../components/Icon'
+import { Overview } from '../components/Overview'
 import { Page } from '../components/Page'
 import { ProgressBar } from '../components/ProgressBar'
 import { useResource } from '../hooks/useResource'
 import { accentStyle, pages, type PageRoute } from '../pages'
-import { currentMilestone, categoriesProgress, categoryProgress, milestoneProgress, milestonesProgress } from '../progress'
+import {
+    assetParts,
+    categoriesProgress,
+    categoryParts,
+    categoryProgress,
+    currentMilestone,
+    milestoneParts,
+    milestoneProgress,
+    milestonesProgress,
+    taskParts,
+    tasksProgress,
+} from '../progress'
 
 function card(path: string): PageRoute {
     return pages.find((page) => page.path === path) ?? pages[0]
@@ -34,6 +46,9 @@ export function Dashboard() {
     const allDocuments = documents.data ?? []
 
     const current = currentMilestone(allMilestones)
+    const allTasks = tasksProgress(allMilestones)
+    const reached = milestonesProgress(allMilestones)
+    const checks = categoriesProgress(allCategories)
     const openTasks = allMilestones.reduce(
         (total, milestone) => total + milestone.tasks.filter((task) => !task.done).length,
         0,
@@ -43,17 +58,22 @@ export function Dashboard() {
         <Page title="Dashboard" error={milestones.error ?? categories.error ?? documents.error}>
             <div className="dash-grid">
                 <DashCard page={card('/milestones')}>
-                    <div className="dash-row">
-                        <span className="name muted">Milestones done</span>
-                        <ProgressBar value={milestonesProgress(allMilestones)} width={150} />
-                    </div>
+                    <Overview
+                        value={allTasks}
+                        parts={milestoneParts(allMilestones)}
+                        note={`${reached.done}/${reached.total} milestones`}
+                    />
                     {current ? (
                         <>
                             <div className="dash-row">
                                 <span className="name">
                                     Milestone {current.number} - {current.title}
                                 </span>
-                                <ProgressBar value={milestoneProgress(current)} width={150} />
+                                <ProgressBar
+                                    value={milestoneProgress(current)}
+                                    parts={taskParts(current)}
+                                    width={240}
+                                />
                             </div>
                             {current.tasks
                                 .filter((task) => !task.done)
@@ -74,14 +94,19 @@ export function Dashboard() {
                 </DashCard>
 
                 <DashCard page={card('/items')}>
-                    <div className="dash-row">
-                        <span className="name muted">Assets complete</span>
-                        <ProgressBar value={categoriesProgress(allCategories)} width={150} />
-                    </div>
+                    <Overview
+                        value={checks}
+                        parts={categoryParts(allCategories)}
+                        note={`${checks.done}/${checks.total} checks`}
+                    />
                     {allCategories.map((category) => (
                         <div className="dash-row" key={category.id}>
                             <span className="name">{category.name}</span>
-                            <ProgressBar value={categoryProgress(category)} width={150} />
+                            <ProgressBar
+                                value={categoryProgress(category)}
+                                parts={assetParts(category)}
+                                width={240}
+                            />
                         </div>
                     ))}
                     {allCategories.length === 0 && <div className="dash-row dim">No categories yet.</div>}

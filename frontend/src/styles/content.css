@@ -76,33 +76,93 @@ button.title:hover {
 
 .progress {
     display: flex;
+    flex: 1;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .progress-track {
     flex: 1;
     min-width: 54px;
-    height: 10px;
+    height: 16px;
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 8px;
     background: var(--surface0);
 }
 
 .progress-fill {
     height: 100%;
-    border-radius: 5px;
+    border-radius: 8px;
     background: var(--accent);
-    transition: width 0.18s ease;
+    transition: width 0.2s ease;
 }
 
 .progress-fill.complete {
     background: var(--green);
 }
 
+/* One block per part, as wide as that part is big. */
+.segments {
+    display: flex;
+    flex: 1;
+    gap: 3px;
+    min-width: 54px;
+    height: 16px;
+    overflow: hidden;
+}
+
+.segment {
+    min-width: 3px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--surface0);
+}
+
+.segment-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.2s ease;
+}
+
+.segment-fill.complete {
+    background: var(--green);
+}
+
+.overview .segments {
+    gap: 4px;
+    height: 20px;
+}
+
+/* A fixed share of the row, so the bars of a list line up with each other. */
+.card-head .progress,
+.subcategory-head .progress {
+    flex: none;
+    width: 58%;
+}
+
+.overview .progress-track {
+    height: 20px;
+    border-radius: 10px;
+}
+
+.rail .progress-track {
+    height: 10px;
+    border-radius: 5px;
+}
+
+.progress-percent {
+    min-width: 36px;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--subtext0);
+}
+
 .progress-label {
-    min-width: 42px;
-    font-size: 13px;
+    min-width: 46px;
+    font-size: 14px;
     text-align: right;
     font-variant-numeric: tabular-nums;
     color: var(--subtext0);
@@ -169,7 +229,7 @@ button.title:hover {
 }
 
 .items-table .progress-col {
-    width: 190px;
+    width: 230px;
 }
 
 /* The name column keeps a sane width and the last column swallows the rest,
@@ -544,6 +604,7 @@ button.title:hover {
     .card-head .progress,
     .subcategory-head .progress {
         flex: 1;
+        width: auto;
     }
 
     .docs-layout {
@@ -578,6 +639,35 @@ button.title:hover {
     .subcategory {
         padding: 8px;
     }
+}
+
+.overview {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 14px;
+}
+
+.overview-percent {
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+}
+
+.overview-percent.complete {
+    color: var(--green);
+}
+
+.overview-note {
+    white-space: nowrap;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--subtext0);
+}
+
+.dash-card .overview {
+    margin-bottom: 8px;
 }
 
 .empty-row {

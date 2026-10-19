@@ -128,11 +128,26 @@
     color: var(--overlay0);
 }
 
+/* The box itself stays small; this is the area the pointer has to hit. */
+.check-hit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px;
+    margin: -7px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.check-hit:hover {
+    background: var(--surface0);
+}
+
 input[type="checkbox"].check {
     appearance: none;
     position: relative;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex: none;
     border: 1.5px solid var(--surface1);
     border-radius: 5px;
@@ -152,8 +167,8 @@ input[type="checkbox"].check:checked {
 input[type="checkbox"].check:checked::after {
     content: "";
     position: absolute;
-    left: 5px;
-    top: 2px;
+    left: 6px;
+    top: 3px;
     width: 5px;
     height: 9px;
     border: solid var(--crust);
@@ -255,13 +270,13 @@ input[type="checkbox"].check:checked::after {
     }
 
     input[type="checkbox"].check {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
     }
 
     input[type="checkbox"].check:checked::after {
-        left: 6px;
-        top: 3px;
+        left: 7px;
+        top: 4px;
         width: 6px;
         height: 11px;
     }

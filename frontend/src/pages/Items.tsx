@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import * as api from '../api'
+import { Check } from '../components/Check'
 import { EntryDialog, type Entry } from '../components/EntryDialog'
 import { Icon } from '../components/Icon'
 import { InlineAdd } from '../components/InlineAdd'
+import { Overview } from '../components/Overview'
 import { Page } from '../components/Page'
 import { PageRail } from '../components/PageRail'
 import { ProgressBar } from '../components/ProgressBar'
@@ -11,7 +13,7 @@ import { RowActions } from '../components/RowActions'
 import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useResource } from '../hooks/useResource'
 import { useSortable, type SortableList } from '../hooks/useSortable'
-import { assetProgress, categoriesProgress, categoryProgress, countAssets } from '../progress'
+import { assetProgress, categoriesProgress, categoryParts, categoryProgress, countAssets } from '../progress'
 import type { Asset, Category, ChecklistItem } from '../types'
 
 function assetCount(category: Category): string {
@@ -67,9 +69,7 @@ function AssetTable({ assets, checklist, onAdd, onCheck, onEdit, onDelete }: Ass
                                     const checked = asset.checks.includes(item.id)
                                     return (
                                         <td key={item.id} className="check-col">
-                                            <input
-                                                type="checkbox"
-                                                className="check"
+                                            <Check
                                                 title={item.label}
                                                 checked={checked}
                                                 onChange={() => onCheck(asset, item.id, !checked)}
@@ -110,6 +110,8 @@ export function Items() {
     const remove = useConfirmDelete()
 
     const categories = data ?? []
+    const overall = categoriesProgress(categories)
+    const assets = categories.reduce((total, category) => total + countAssets(category), 0)
     const sort = useSortable()
     const order = sort.list('categories', categories, (from, to) =>
         run(() => api.categories.move(categories[from].id, to)),
@@ -155,8 +157,11 @@ export function Items() {
             error={error}
             head={
                 <>
-                    <ProgressBar value={categoriesProgress(categories)} width={240} />
-                    <span className="spacer" />
+                    <Overview
+                        value={overall}
+                        parts={categoryParts(categories)}
+                        note={`${overall.done}/${overall.total} checks - ${assets} assets`}
+                    />
                     <InlineAdd
                         label="category"
                         accent
@@ -213,7 +218,7 @@ export function Items() {
                                 onDelete={() => removeCategory(category, 'category')}
                             />
                             <span className="spacer" />
-                            <ProgressBar value={categoryProgress(category)} width={220} />
+                            <ProgressBar value={categoryProgress(category)} />
                         </div>
 
                         {open && (
@@ -276,7 +281,7 @@ export function Items() {
                                             onDelete={() => removeCategory(child, 'subcategory')}
                                         />
                                         <span className="spacer" />
-                                        <ProgressBar value={categoryProgress(child, category.checklist)} width={220} />
+                                        <ProgressBar value={categoryProgress(child, category.checklist)} />
                                     </div>
                                     <AssetTable
                                         assets={assetsOf(child)}

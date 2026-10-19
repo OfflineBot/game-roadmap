@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import * as api from '../api'
+import { Check } from '../components/Check'
 import { EntryDialog, type Entry } from '../components/EntryDialog'
 import { Icon } from '../components/Icon'
 import { IconButton } from '../components/IconButton'
@@ -29,9 +30,7 @@ export function Bugs() {
 
     const row = (bug: Bug) => (
         <div className="task hoverable" key={bug.id}>
-            <input
-                type="checkbox"
-                className="check"
+            <Check
                 checked={bug.fixed}
                 title={bug.fixed ? 'Reopen bug' : 'Mark as fixed'}
                 onChange={() => run(() => api.bugs.update(bug.id, { fixed: !bug.fixed }))}

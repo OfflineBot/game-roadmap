@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
 import * as api from '../api'
+import { Check } from '../components/Check'
 import { EntryDialog, type Entry } from '../components/EntryDialog'
 import { Icon } from '../components/Icon'
 import { InlineAdd } from '../components/InlineAdd'
+import { Overview } from '../components/Overview'
 import { Page } from '../components/Page'
 import { PageRail } from '../components/PageRail'
 import { ProgressBar } from '../components/ProgressBar'
@@ -12,7 +14,13 @@ import { useConfirmDelete } from '../hooks/useConfirmDelete'
 import { useHotkeys } from '../hooks/useHotkeys'
 import { useResource } from '../hooks/useResource'
 import { useSortable } from '../hooks/useSortable'
-import { currentMilestone, milestoneProgress, milestonesProgress } from '../progress'
+import {
+    currentMilestone,
+    milestoneParts,
+    milestoneProgress,
+    milestonesProgress,
+    tasksProgress,
+} from '../progress'
 import type { Milestone, Task } from '../types'
 
 type Editing =
@@ -49,6 +57,8 @@ export function Milestones() {
     const remove = useConfirmDelete()
 
     const milestones = data ?? []
+    const allTasks = tasksProgress(milestones)
+    const reached = milestonesProgress(milestones)
     // Only the milestone being worked on is open to begin with.
     const currentId = currentMilestone(milestones)?.id
     const sort = useSortable()
@@ -81,7 +91,13 @@ export function Milestones() {
         <Page
             title="Milestones"
             error={error}
-            head={<ProgressBar value={milestonesProgress(milestones)} width={240} />}
+            head={
+                <Overview
+                    value={allTasks}
+                    parts={milestoneParts(milestones)}
+                    note={`${allTasks.done}/${allTasks.total} tasks - ${reached.done}/${reached.total} milestones done`}
+                />
+            }
             rail={
                 <PageRail
                     title="Roadmap"
@@ -142,7 +158,7 @@ export function Milestones() {
                                     }
                                 />
                                 <span className="spacer" />
-                                <ProgressBar value={progress} width={220} />
+                                <ProgressBar value={progress} />
                             </div>
 
                             {open && (
@@ -150,9 +166,7 @@ export function Milestones() {
                                     <RichTextView html={milestone.description} compact />
                                     {tasks.items.map((task, taskIndex) => (
                                         <div className="task hoverable" key={task.id} {...tasks.row(taskIndex)}>
-                                            <input
-                                                type="checkbox"
-                                                className="check"
+                                            <Check
                                                 checked={task.done}
                                                 title={task.done ? 'Mark as open' : 'Mark as done'}
                                                 onChange={() => run(() => api.tasks.update(task.id, { done: !task.done }))}
