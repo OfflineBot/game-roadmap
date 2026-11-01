@@ -11,7 +11,7 @@ interface Props {
 export function Overview({ value, parts, note }: Props) {
     return (
         <div className="overview">
-            <span className={value.complete ? 'overview-percent complete' : 'overview-percent'}>
+            <span className={value.complete ? 'overview-number complete' : 'overview-number'}>
                 {percent(value)}%
             </span>
             <ProgressBar value={value} parts={parts} label={false} />

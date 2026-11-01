@@ -648,14 +648,14 @@ button.title:hover {
     gap: 14px;
 }
 
-.overview-percent {
+.overview-number {
     font-size: 24px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--accent);
 }
 
-.overview-percent.complete {
+.overview-number.complete {
     color: var(--green);
 }
 

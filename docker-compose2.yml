@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    restart: always
+    environment:
+      DB_PATH: /data/roadmap.db
+      PORT: "8080"
+      # The uid the server runs as; it takes ownership of ./data on start.
+      APP_UID: "${APP_UID:-1000}"
+      APP_GID: "${APP_GID:-1000}"
+    volumes:
+      - ./data:/data
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "${WEB_PORT:-8420}:80"
+    depends_on:
+      - backend

@@ -139,6 +139,19 @@ export function wouldBeCircular(crates: Crate[], importer: number, imported: num
     return reaches(imported)
 }
 
+/** How many crates import each one - the most imported are the risky ones to change. */
+export function importCounts(crates: Crate[]): { crate: Crate; count: number }[] {
+    const counts = new Map<number, number>()
+    for (const crate of crates) {
+        for (const id of crate.depends_on) {
+            counts.set(id, (counts.get(id) ?? 0) + 1)
+        }
+    }
+    return crates
+        .map((crate) => ({ crate, count: counts.get(crate.id) ?? 0 }))
+        .sort((a, b) => b.count - a.count)
+}
+
 export function dependencyCount(crates: Crate[]): number {
     return crates.reduce((total, crate) => total + crate.depends_on.length, 0)
 }
